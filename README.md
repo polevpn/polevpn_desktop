@@ -1,1 +1,0 @@
-# polevpn_desktop

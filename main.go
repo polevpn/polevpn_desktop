@@ -1,34 +1,50 @@
 package main
 
 import (
-	"os"
-
-	"github.com/therecipe/qt/core"
-	"github.com/therecipe/qt/gui"
-	"github.com/therecipe/qt/qml"
-	"github.com/therecipe/qt/quickcontrols2"
+	"github.com/getlantern/systray"
+	"github.com/getlantern/systray/example/icon"
+	"github.com/polevpn/elog"
+	"github.com/webview/webview"
 )
 
 func main() {
 
-	core.QCoreApplication_SetApplicationName("PoleVPN")
-	core.QCoreApplication_SetOrganizationName("PoleVPN")
-	core.QCoreApplication_SetAttribute(core.Qt__AA_EnableHighDpiScaling, true)
+	// flag.Parse()
+	// defer elog.Flush()
 
-	gui.NewQGuiApplication(len(os.Args), os.Args)
+	//systray.Register(onReady, func() { elog.Info("exit") })
 
-	var (
-		settings = core.NewQSettings5(nil)
-		style    = quickcontrols2.QQuickStyle_Name()
-	)
-	if style != "" {
-		settings.SetValue("style", core.NewQVariant1(style))
-	} else {
-		quickcontrols2.QQuickStyle_SetStyle(settings.Value("style", core.NewQVariant1("")).ToString())
-	}
+	w := webview.New(false)
 
-	var engine = qml.NewQQmlApplicationEngine(nil)
-	engine.Load(core.NewQUrl3("qrc:/main.qml", 0))
+	defer w.Destroy()
+	w.SetTitle("xxxxxx")
+	w.SetSize(400, 600, webview.HintNone)
+	w.Navigate("niubit.com/app")
 
-	gui.QGuiApplication_Exec()
+	elog.Info("xxxxx")
+	elog.Info("xxxxxxxxxxx")
+
+	w.Run()
+
+}
+
+func onReady() {
+	systray.SetTemplateIcon(icon.Data, icon.Data)
+	systray.SetTitle("Webview example")
+	mShowLantern := systray.AddMenuItem("Show Lantern", "")
+	mShowWikipedia := systray.AddMenuItem("Show Wikipedia", "")
+	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
+	go func() {
+		for {
+			select {
+			case <-mShowLantern.ClickedCh:
+				elog.Info("xxxxx1")
+			case <-mShowWikipedia.ClickedCh:
+				elog.Info("xxxxx2")
+			case <-mQuit.ClickedCh:
+				systray.Quit()
+			}
+		}
+	}()
+
 }
