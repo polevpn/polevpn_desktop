@@ -1,46 +1,45 @@
 package main
 
 import (
+	"flag"
+
 	"github.com/getlantern/systray"
 	"github.com/getlantern/systray/example/icon"
 	"github.com/polevpn/elog"
 	"github.com/webview/webview"
 )
 
+var webView webview.WebView
+
 func main() {
 
-	// flag.Parse()
-	// defer elog.Flush()
+	flag.Parse()
+	defer elog.Flush()
 
-	//systray.Register(onReady, func() { elog.Info("exit") })
+	systray.Register(onReady, func() { elog.Info("exit") })
 
-	w := webview.New(false)
+	webView = webview.New(false)
+	defer webView.Destroy()
 
-	defer w.Destroy()
-	w.SetTitle("xxxxxx")
-	w.SetSize(400, 600, webview.HintNone)
-	w.Navigate("niubit.com/app")
-
-	elog.Info("xxxxx")
-	elog.Info("xxxxxxxxxxx")
-
-	w.Run()
-
+	webView.SetTitle("Niubit")
+	webView.SetSize(300, 600, webview.HintNone)
+	webView.Navigate("https://www.niubitstest.com/app")
+	webView.Run()
 }
 
 func onReady() {
 	systray.SetTemplateIcon(icon.Data, icon.Data)
-	systray.SetTitle("Webview example")
-	mShowLantern := systray.AddMenuItem("Show Lantern", "")
-	mShowWikipedia := systray.AddMenuItem("Show Wikipedia", "")
-	mQuit := systray.AddMenuItem("Quit", "Quit the whole app")
+	systray.SetTitle("Niubit")
+	mShowApp := systray.AddMenuItem("Open App", "")
+	mHideApp := systray.AddMenuItem("Hide App", "")
+	mQuit := systray.AddMenuItem("Quit", "Quit")
 	go func() {
 		for {
 			select {
-			case <-mShowLantern.ClickedCh:
-				elog.Info("xxxxx1")
-			case <-mShowWikipedia.ClickedCh:
-				elog.Info("xxxxx2")
+			case <-mShowApp.ClickedCh:
+				webView.Show()
+			case <-mHideApp.ClickedCh:
+				webView.Hide()
 			case <-mQuit.ClickedCh:
 				systray.Quit()
 			}
