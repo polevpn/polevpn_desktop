@@ -16,14 +16,15 @@ func main() {
 	flag.Parse()
 	defer elog.Flush()
 
-	systray.Register(onReady, func() { elog.Info("exit") })
-
-	webView = webview.New(false)
+	webView = webview.New(true)
 	defer webView.Destroy()
 
 	webView.SetTitle("Niubit")
 	webView.SetSize(300, 600, webview.HintNone)
-	webView.Navigate("https://www.niubitstest.com/app")
+	webView.Navigate("file://pages/index.html")
+
+	systray.Register(onReady, func() { elog.Info("exit") })
+
 	webView.Run()
 }
 
