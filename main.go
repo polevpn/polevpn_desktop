@@ -5,9 +5,8 @@ import (
 	"os"
 
 	"github.com/getlantern/systray"
-	"github.com/getlantern/systray/example/icon"
 	"github.com/polevpn/elog"
-	"github.com/webview/webview"
+	"github.com/polevpn/webview"
 )
 
 var webView webview.WebView
@@ -20,7 +19,7 @@ func main() {
 	webView = webview.New(true)
 	defer webView.Destroy()
 
-	webView.SetTitle("Niubit")
+	webView.SetTitle("PoleVPN")
 	webView.SetSize(300, 600, webview.HintFixed)
 
 	dir, err := os.Getwd()
@@ -40,8 +39,8 @@ func main() {
 }
 
 func onReady() {
-	systray.SetTemplateIcon(icon.Data, icon.Data)
-	systray.SetTitle("Niubit")
+	//systray.SetTemplateIcon(icon.Data, icon.Data)
+	systray.SetTitle("PoleVPN")
 	mShowApp := systray.AddMenuItem("Open App", "")
 	mHideApp := systray.AddMenuItem("Hide App", "")
 	mQuit := systray.AddMenuItem("Quit", "Quit")
