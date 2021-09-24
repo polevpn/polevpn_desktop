@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"os"
 
 	"github.com/getlantern/systray"
 	"github.com/getlantern/systray/example/icon"
@@ -20,8 +21,18 @@ func main() {
 	defer webView.Destroy()
 
 	webView.SetTitle("Niubit")
-	webView.SetSize(300, 600, webview.HintNone)
-	webView.Navigate("file://pages/index.html")
+	webView.SetSize(300, 600, webview.HintFixed)
+
+	dir, err := os.Getwd()
+	if err != nil {
+		elog.Fatal("xxxx")
+	}
+	webView.Navigate("file://" + dir + "/index.html")
+
+	webView.Bind("hello", func(msg map[string]interface{}) string {
+		elog.Info("get message ", msg)
+		return "sdddddd"
+	})
 
 	systray.Register(onReady, func() { elog.Info("exit") })
 
