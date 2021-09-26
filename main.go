@@ -4,38 +4,37 @@ import (
 	"flag"
 	"os"
 
-	"github.com/getlantern/systray"
 	"github.com/polevpn/elog"
+	"github.com/polevpn/systray"
 	"github.com/polevpn/webview"
 )
 
-var webView webview.WebView
+var WebView webview.WebView
 
 func main() {
 
 	flag.Parse()
 	defer elog.Flush()
 
-	webView = webview.New(true)
-	defer webView.Destroy()
+	WebView = webview.New(true)
+	defer WebView.Destroy()
 
-	webView.SetTitle("PoleVPN")
-	webView.SetSize(300, 600, webview.HintFixed)
+	WebView.SetSize(300, 600, webview.HintFixed)
 
 	dir, err := os.Getwd()
 	if err != nil {
 		elog.Fatal("xxxx")
 	}
-	webView.Navigate("file://" + dir + "/index.html")
+	WebView.Navigate("file://" + dir + "/index.html")
 
-	webView.Bind("hello", func(msg map[string]interface{}) string {
+	WebView.Bind("hello", func(msg map[string]interface{}) string {
 		elog.Info("get message ", msg)
 		return "sdddddd"
 	})
 
 	systray.Register(onReady, func() { elog.Info("exit") })
 
-	webView.Run()
+	WebView.Run()
 }
 
 func onReady() {
@@ -48,9 +47,9 @@ func onReady() {
 		for {
 			select {
 			case <-mShowApp.ClickedCh:
-				webView.Show()
+				WebView.Show()
 			case <-mHideApp.ClickedCh:
-				webView.Hide()
+				WebView.Hide()
 			case <-mQuit.ClickedCh:
 				systray.Quit()
 			}
