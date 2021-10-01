@@ -18,7 +18,7 @@ func main() {
 
 	WebView = webview.New(true, false)
 	defer WebView.Destroy()
-	WebView.SetSize(300, 575, webview.HintFixed)
+	WebView.SetSize(300, 600, webview.HintFixed)
 
 	dir, err := os.Getwd()
 	if err != nil {
@@ -47,16 +47,13 @@ func onReady() {
 	systray.SetTooltip("PoleVPN")
 	systray.SetTemplateIcon(iconData, iconData)
 	systray.SetIcon(iconData)
-	mShowApp := systray.AddMenuItem("Open App", "OpenApp")
-	mHideApp := systray.AddMenuItem("Hide App", "HideApp")
+	mShowApp := systray.AddMenuItem("Show PoleVPN", "Show PoleVPN")
 	mQuit := systray.AddMenuItem("Quit", "Quit")
 	go func() {
 		for {
 			select {
 			case <-mShowApp.ClickedCh:
 				WebView.Show()
-			case <-mHideApp.ClickedCh:
-				WebView.Hide()
 			case <-mQuit.ClickedCh:
 				WebView.Terminate()
 				systray.Quit()
