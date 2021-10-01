@@ -16,10 +16,9 @@ func main() {
 	flag.Parse()
 	defer elog.Flush()
 
-	WebView = webview.New(true)
+	WebView = webview.New(true, false)
 	defer WebView.Destroy()
-
-	WebView.SetSize(300, 600, webview.HintFixed)
+	WebView.SetSize(300, 575, webview.HintFixed)
 
 	dir, err := os.Getwd()
 	if err != nil {
@@ -38,10 +37,18 @@ func main() {
 }
 
 func onReady() {
-	//systray.SetTemplateIcon(icon.Data, icon.Data)
-	systray.SetTitle("PoleVPN")
-	mShowApp := systray.AddMenuItem("Open App", "")
-	mHideApp := systray.AddMenuItem("Hide App", "")
+
+	iconData, err := GetIconData("polevpn.ico")
+	if err != nil {
+		elog.Error(err)
+		return
+	}
+	elog.Info(iconData)
+	systray.SetTooltip("PoleVPN")
+	systray.SetTemplateIcon(iconData, iconData)
+	systray.SetIcon(iconData)
+	mShowApp := systray.AddMenuItem("Open App", "OpenApp")
+	mHideApp := systray.AddMenuItem("Hide App", "HideApp")
 	mQuit := systray.AddMenuItem("Quit", "Quit")
 	go func() {
 		for {
@@ -51,9 +58,9 @@ func onReady() {
 			case <-mHideApp.ClickedCh:
 				WebView.Hide()
 			case <-mQuit.ClickedCh:
+				WebView.Terminate()
 				systray.Quit()
 			}
 		}
 	}()
-
 }
