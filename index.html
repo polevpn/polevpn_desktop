@@ -7,27 +7,22 @@
 </head>
 <body>
   <div id="app">
-    <el-container>
+    <el-container direction="vertical">
       <el-header>
         <span class="header-text">PoleVPN</span>
-        <i class="el-icon-s-unfold"  @click="left_drawer = true"></i>
-        <i class="el-icon-plus"  @click="right_drawer = true"></i>
+        <i class="el-icon-s-unfold" style="cursor: pointer;"  @click="left_drawer = true"></i>
+        <i class="el-icon-plus" style="cursor: pointer;" @click="right_drawer = true"></i>
       </el-header>
       <el-main>
-        <el-select v-model="value" placeholder="Select Access Server">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-
+        <el-select v-model="value" style="margin-top:30px;" placeholder="Select Access Server">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
             <span style="float: left">{{ item.label }}</span>
             <span style="float: right;font-size: 16px;">           
-              <i class="el-icon-edit-outline"   @click="right_drawer = true"></i>
+              <i class="el-icon-edit-outline"  @click="right_drawer = true"></i>
             </span>
           </el-option>
         </el-select>
-        <el-button type="primary" icon="el-icon-s-promotion" circle></el-button>
+        <el-button class="el-button-connect" icon="el-icon-s-promotion" circle></el-button>
         <div style="margin-top: 40px;line-height: 30px;">Remote: 107.112.123.87</div>
         <div style="line-height: 30px;">Local: 10.8.0.45</div>
       </el-main>
@@ -37,39 +32,50 @@
       </el-footer>
     </el-container>
 
-    <el-drawer class="el-drawer-left" size="70%" :show-close="false" title="PoleVPN" :visible.sync="left_drawer" :direction="left_direction">
-      <hr/>
-      <div style="height: 454px;">
-        <div style="line-height: 30px;">Log</div>
-        <div style="line-height: 30px;">About</div>
-      </div>
-      <div style="background-color: #B3C0D1; text-align: center;line-height: 30px;font-size: 14px;">version: 1.0.11</div>
+    <el-drawer size="70%" title="PoleVPN Settings" :visible.sync="left_drawer" :direction="left_direction">
+    <el-container>
+      <el-main>
+        <div style="text-align: left;margin-top: 1px;">
+          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'"  class="setting-menu">
+            <i class="el-icon-document"></i> Log
+          </div>
+          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'"  class="setting-menu">
+            <i class="el-icon-info"></i> About
+          </div>
+          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'"  class="setting-menu">
+            <i class="el-icon-question"></i> Help
+          </div>
+        </div>
+      </el-main>
+      <el-footer>
+        <div style="text-align: center;line-height: 60px;font-size: 14px;">Version: 1.0.11</div>
+      </el-footer>
+    </el-container>
     </el-drawer>
-    <el-drawer  size="100%" title="Add Access Server" :visible.sync="right_drawer" :direction="right_direction">
+    <el-drawer  ref="rdrawer" size="100%" title="Add Access Server" :visible.sync="right_drawer" :direction="right_direction" destroy-on-close :before-close="onRightDrawerClose" >
       <div class="el-drawer-right">
-        <hr/>
         <el-form ref="form" size="small" :model="form" label-width="80px" label-position="top">
-          <el-form-item label="Endpoint">
-            <el-input></el-input>
+          <el-form-item label="Endpoint" prop="endpoint">
+            <el-input v-model="form.endpoint" placeholder="wss://"></el-input>
           </el-form-item>
-          <el-form-item label="User">
-            <el-input></el-input>
+          <el-form-item label="User" prop="user">
+            <el-input v-model="form.user"></el-input>
           </el-form-item>
-          <el-form-item label="Password">
-            <el-input></el-input>
+          <el-form-item label="Password" prop="password">
+            <el-input v-model="form.password" minlength="6" maxlength="16" show-password></el-input>
           </el-form-item>
-          <el-form-item label="Skip SSL Verify">
-            <el-switch></el-switch>
+          <el-form-item label="Skip SSL Verify" prop="skip_ssl_verify">
+            <el-switch v-model="form.skip_ssl_verify"></el-switch>
           </el-form-item>
-          <el-form-item label="Use Remote Route Rules">
-            <el-switch></el-switch>
+          <el-form-item label="Use Remote Route Rules" prop="use_remote_route_rules">
+            <el-switch v-model="form.use_remote_route_rules"></el-switch>
           </el-form-item>
-          <el-form-item label="Local Route Rules(option)">
-            <el-input type="textarea"></el-input>
+          <el-form-item label="Local Route Rules(option)" prop="local_route_rules">
+            <el-input v-model="form.local_route_rules" rows="4" type="textarea" placeholder="10.8.0.0/8,172.31.0.0/16"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" @click="onSubmit">立即创建</el-button>
-            <el-button>取消</el-button>
+            <el-button type="primary" plain @click="onSubmit">Create</el-button>
+            <el-button @click="onReset">Reset</el-button>
           </el-form-item>
         </el-form>
       </div>
@@ -107,59 +113,89 @@
         left_direction: 'ltr',
         right_direction: 'rtl',
         form: {
-          name: '',
-          region: '',
-          date1: '',
-          date2: '',
-          delivery: false,
-          type: [],
-          resource: '',
-          desc: ''
+          endpoint: '',
+          user: '',
+          password: '',
+          skip_ssl_verify: true,
+          use_remote_route_rules: true,
+          local_route_rules: '',
         }
       },
       methods:{
           onBtnClick: function(){
               this.visible = true
+          }, 
+          onSubmit: function(){
+            this.$refs.form.resetFields()
+            this.$refs.rdrawer.closeDrawer()
+          },
+          onReset: function(){
+            this.$refs.form.resetFields()
+          },
+          onRightDrawerClose: function(done){
+            this.$refs.form.resetFields()
+            done()
           }
       }
     })
   </script>
   <style>
-    body {
-      display: block;
+    html,body,#app,.el-container,.el-drawer {
+      height: 100%;
       margin: auto;
     }
-    .el-button {
-      background-color: #B3C0D1;
-      margin-top: 100px;
-      height: 100px;
-      width: 100px;
+ 
+    .el-button-connect {
+      margin-top: 80px;
+      height: 120px;
+      width: 120px;
       font-size: 40px;
-      color: #444;
-      border: 0px;
-      box-shadow:0px 0px 3px #000;
-    }
-
-    .el-select{
-      margin-top: 20px;
+      border: 4px;
+      color: blueviolet;
+      box-shadow:0px 0px 10px #666;
     }
 
     .el-header, .el-footer {
-      background-color: #B3C0D1;
-      color: #666;
       text-align: center;
       line-height: 60px;
-      font-size: 30px;
-      padding-left: 10px;
-      padding-right: 10px;
+      padding: 0px 10px 0px 10px;
+      background-color: #fff;
     }  
 
-    .el-drawer {
-      background-color: #E9EEF3;
+    .el-header{
+      font-size: 30px;
     }
 
+    .el-drawer {
+      background-color: #eee;
+      padding: 0px 0px 0px 0px;
+    }
+
+    .el-drawer__header{
+      padding: 0px 10px 0px 10px;
+      margin-bottom: 0px;
+      font-weight: bold;
+      background-color: #fff;
+      height: 60px;
+    }
     .el-drawer-right {
       padding: 10px;
+    }
+
+    .setting-menu {
+      padding-left:10px;
+      line-height: 40px;
+      cursor:pointer;
+      border-bottom-color: #fff;
+      border-bottom-width: 1px;
+      border-bottom-style:solid;
+    }
+
+    .el-main {
+      background-color: #eee;
+      color: #666;
+      text-align: center;
+      padding: 0px 0px 0px 0px;
     }
 
     .el-footer {
@@ -190,12 +226,5 @@
       color: #666;
     }
 
-
-    .el-main {
-      background-color: #E9EEF3;
-      color: #666;
-      text-align: center;
-      height: 452px;
-    }
   </style>
 </html>

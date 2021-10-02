@@ -16,9 +16,9 @@ func main() {
 	flag.Parse()
 	defer elog.Flush()
 
-	WebView = webview.New(true, false)
+	WebView = webview.New(true, true)
 	defer WebView.Destroy()
-	WebView.SetSize(300, 600, webview.HintFixed)
+	WebView.SetSize(300, 570, webview.HintFixed)
 
 	dir, err := os.Getwd()
 	if err != nil {
