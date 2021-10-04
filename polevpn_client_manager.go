@@ -105,7 +105,7 @@ func (pcm *PoleVPNClientManager) eventHandler(event int, client *core.PoleVpnCli
 			pcm.callback(anyvalue.New().Set("event", "started").Set("data", nil))
 		}
 	case core.CLIENT_EVENT_ERROR:
-		glog.Info("client error ", av.Get("error").AsStr())
+		glog.Info("Unexception error,", av.Get("error").AsStr())
 		if pcm.callback != nil {
 			pcm.callback(anyvalue.New().Set("event", "error").Set("data", av.AsMap()))
 		}
@@ -122,6 +122,8 @@ func (pcm *PoleVPNClientManager) Start(server AccessServer) error {
 	if pcm.started {
 		return errors.New("client have started")
 	}
+
+	glog.Info("Connect to ", server.Endpoint)
 
 	pcm.server = server
 
