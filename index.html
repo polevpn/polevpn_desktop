@@ -4,27 +4,55 @@
   <meta charset="UTF-8">
   <!-- import CSS -->
   <link rel="stylesheet" href="./element-ui/lib/theme-chalk/index.css">
+  <script>
+    //shortcut for macos
+    window.addEventListener("keypress", (event) => {  
+        if (event.metaKey && event.key === 'c') {
+          document.execCommand("copy")
+          event.preventDefault();
+        }
+        if (event.metaKey && event.key === 'v') {
+          document.execCommand("paste")
+          event.preventDefault();
+        }        
+        if (event.metaKey && event.key === 'x') {
+          document.execCommand("cut")
+          event.preventDefault();
+        }
+        if (event.metaKey && event.key === 'z') {
+          document.execCommand("undo")
+          event.preventDefault();
+        }
+        if (event.metaKey && event.key === 'a') {
+          document.execCommand("selectAll")
+          event.preventDefault();
+        }
+    })
+  </script>
 </head>
-<body>
+<body oncontextmenu="return false">
   <div id="app">
     <el-container direction="vertical">
       <el-header>
         <span class="header-text">PoleVPN</span>
-        <i class="el-icon-s-unfold" style="cursor: pointer;"  @click="left_drawer = true"></i>
-        <i class="el-icon-plus" style="cursor: pointer;" @click="right_drawer = true"></i>
+        <i class="el-icon-s-unfold" style="cursor: pointer;"  @click="showLeftDrawer = true"></i>
+        <i class="el-icon-plus" style="cursor: pointer;" @click="onAddClick"></i>
       </el-header>
       <el-main>
-        <el-select v-model="value" style="margin-top:30px;" placeholder="Select Access Server">
+        <el-select v-model="accessServerID" style="margin-top:30px;" placeholder="Select Access Server">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
             <span style="float: left">{{ item.label }}</span>
             <span style="float: right;font-size: 16px;">           
-              <i class="el-icon-edit-outline"  @click="right_drawer = true"></i>
+              <i class="el-icon-edit-outline"  @click="onEditClick(item.value)"></i>
             </span>
           </el-option>
         </el-select>
-        <el-button class="el-button-connect" icon="el-icon-s-promotion" circle></el-button>
-        <div style="margin-top: 40px;line-height: 30px;">Remote: 107.112.123.87</div>
-        <div style="line-height: 30px;">Local: 10.8.0.45</div>
+        <el-tooltip class="item" effect="light" :content="connectTips" :hide-after="1000" placement="top">
+        <el-button class="el-button-connect" :icon="connectIcon" @click="onConnectClick" :disabled="connectDisable" circle></el-button>
+        </el-tooltip>
+        <div style="margin-top: 40px;line-height: 30px;">{{remoteIp}}</div>
+        <div style="line-height: 30px;">{{localIp}}</div>
+        <div style="line-height: 30px;">{{connectStatus}}</div>
       </el-main>
       <el-footer>
         <span class="footer-upload">Upload: 250KB</span>
@@ -32,17 +60,17 @@
       </el-footer>
     </el-container>
 
-    <el-drawer size="70%" title="PoleVPN Settings" :visible.sync="left_drawer" :direction="left_direction">
+    <el-drawer size="70%" title="PoleVPN Settings" :visible.sync="showLeftDrawer" :direction="leftDirection">
     <el-container>
       <el-main>
         <div style="text-align: left;margin-top: 1px;">
-          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'"  class="setting-menu">
-            <i class="el-icon-document"></i> Log
+          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'" @click="onShowLogs"  class="setting-menu">
+            <i class="el-icon-document"></i> Logs
           </div>
-          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'"  class="setting-menu">
+          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'" @click="showAboutDrawer=true"  class="setting-menu">
             <i class="el-icon-info"></i> About
           </div>
-          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'"  class="setting-menu">
+          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'" @click="showHelpDrawer=true"  class="setting-menu">
             <i class="el-icon-question"></i> Help
           </div>
         </div>
@@ -51,35 +79,58 @@
         <div style="text-align: center;line-height: 60px;font-size: 14px;">Version: 1.0.11</div>
       </el-footer>
     </el-container>
+
+    <el-drawer title="Logs" size="100%" :append-to-body="true" :visible.sync="showLogDrawer">
+      <textarea style="height: 100%;width: 100%;">{{log}}</textarea>
     </el-drawer>
-    <el-drawer  ref="rdrawer" size="100%" title="Add Access Server" :visible.sync="right_drawer" :direction="right_direction" destroy-on-close :before-close="onRightDrawerClose" >
+
+    <el-drawer title="About" size="100%" :append-to-body="true" :visible.sync="showAboutDrawer">
+      <p>{{about}}</p>
+    </el-drawer>
+
+    <el-drawer title="Help" size="100%" :append-to-body="true" :visible.sync="showHelpDrawer">
+      <p>{{help}}</p>
+    </el-drawer>
+
+    </el-drawer>
+
+    <el-drawer  ref="rdrawer" size="100%" title="Add Access Server" :visible.sync="showRightDrawer" :direction="rightDirection" destroy-on-close :before-close="onRightDrawerClose" >
       <div class="el-drawer-right">
-        <el-form ref="form" size="small" :model="form" label-width="80px" label-position="top">
-          <el-form-item label="Endpoint" prop="endpoint">
-            <el-input v-model="form.endpoint" placeholder="wss://"></el-input>
+        <el-form ref="form" size="small" :model="form" :rules="rules" label-width="80px" label-position="top">
+          <el-form-item label="Name" prop="Name">
+            <el-input v-model="form.Name" placeholder="server name"></el-input>
           </el-form-item>
-          <el-form-item label="User" prop="user">
-            <el-input v-model="form.user"></el-input>
+          <el-form-item label="Endpoint" prop="Endpoint">
+            <el-input v-model="form.Endpoint" placeholder="start with wss:// or quic://"></el-input>
           </el-form-item>
-          <el-form-item label="Password" prop="password">
-            <el-input v-model="form.password" minlength="6" maxlength="16" show-password></el-input>
+          <el-form-item label="User" prop="User">
+            <el-input v-model="form.User"></el-input>
           </el-form-item>
-          <el-form-item label="Skip SSL Verify" prop="skip_ssl_verify">
-            <el-switch v-model="form.skip_ssl_verify"></el-switch>
+          <el-form-item label="Password" prop="Password">
+            <el-input v-model="form.Password" minlength="6" maxlength="16" show-password></el-input>
           </el-form-item>
-          <el-form-item label="Use Remote Route Rules" prop="use_remote_route_rules">
-            <el-switch v-model="form.use_remote_route_rules"></el-switch>
+          <el-form-item label="Skip SSL Verify" prop="SkipVerifySSL">
+            <el-switch v-model="form.SkipVerifySSL"></el-switch>
           </el-form-item>
-          <el-form-item label="Local Route Rules(option)" prop="local_route_rules">
-            <el-input v-model="form.local_route_rules" rows="4" type="textarea" placeholder="10.8.0.0/8,172.31.0.0/16"></el-input>
+          <el-form-item label="Use Remote Route Rules" prop="UseRemoteRouteRules">
+            <el-switch v-model="form.UseRemoteRouteRules"></el-switch>
+          </el-form-item>
+          <el-form-item label="Sni (option)" prop="Sni">
+            <el-input v-model="form.Sni"></el-input>
+          </el-form-item>
+          <el-form-item label="Local Route Rules (option)" prop="LocalRouteRules">
+            <el-input v-model="form.LocalRouteRules" rows="4" type="textarea" placeholder="10.8.0.0/8,172.31.0.0/16"></el-input>
           </el-form-item>
           <el-form-item>
-            <el-button type="primary" plain @click="onSubmit">Create</el-button>
+            <el-button type="primary" plain @click="onSubmit">Save</el-button>
+            <el-button type="primary" plain @click="onDeleteClick" v-show="showDelete" >Delete</el-button>
             <el-button @click="onReset">Reset</el-button>
+
           </el-form-item>
         </el-form>
       </div>
     </el-drawer>
+
   </div>
 </body>
   <!-- import Vue before Element -->
@@ -88,54 +139,237 @@
   <script src="./element-ui/lib/index.js"></script>
   <script>
 
-    new Vue({
+    var App = new Vue({
       el: '#app',
       data: { 
-        options:[{
-          value: '选项1',
-          label: 'HongKong Node'
-        }, {
-          value: '选项2',
-          label: 'North America'
-        }, {
-          value: '选项3',
-          label: 'South East Asia'
-        }, {
-          value: '选项4',
-          label: 'Japan'
-        }, {
-          value: '选项5',
-          label: 'China'
-        }],
-        value: '',
-        left_drawer: false,
-        right_drawer: false,
-        left_direction: 'ltr',
-        right_direction: 'rtl',
+        log:'',
+        about:'',
+        help:'',
+        options:[],
+        accessServerID: '',
+        connectIcon:'el-icon-s-promotion',
+        connectTips:'Connect To Access Server',
+        showLeftDrawer: false,
+        showRightDrawer: false,
+        showLogDrawer:false,
+        showAboutDrawer:false,
+        showHelpDrawer:false,
+        showDelete: false,
+        showAlert:false,
+        leftDirection: 'ltr',
+        rightDirection: 'rtl',
         form: {
-          endpoint: '',
-          user: '',
-          password: '',
-          skip_ssl_verify: true,
-          use_remote_route_rules: true,
-          local_route_rules: '',
-        }
+          ID:null,
+          Name:'',
+          Endpoint: '',
+          User: '',
+          Password: '',
+          Sni:'',
+          SkipVerifySSL: true,
+          UseRemoteRouteRules: true,
+          LocalRouteRules: '',
+        },
+        rules: {
+          Name: [
+            { required: true, message: 'Name can not be empty', trigger: 'blur' },
+            { min: 3, max: 32, message: 'length must to be 3 to 32', trigger: 'blur' }
+          ],
+          Endpoint: [
+            { required: true, message: 'Enpoint can not be empty', trigger: 'blur' }
+          ],
+          User: [
+            { required: true, message: 'User can not be empty', trigger: 'blur' },
+            { min: 3, max: 32, message: 'length must to be 3 to 32', trigger: 'blur' }          
+          ],
+          Password: [
+            { required: true, message: 'Password can not be empty', trigger: 'blur' },
+            { min: 6, max: 16, message: 'length must to be 6 to 16', trigger: 'blur' }          
+          ],
+        },
+        servers:[],
+        localIp:'',
+        remoteIp:'',
+        connectDisable:false,
+        connectStatus:''
+      },
+      mounted:function(){
+        this.loadAllServers(function(){
+          if(App.accessServerID == '' && App.servers.length > 0){
+            App.accessServerID = App.servers[0].ID
+          }
+        })
       },
       methods:{
-          onBtnClick: function(){
-              this.visible = true
-          }, 
-          onSubmit: function(){
-            this.$refs.form.resetFields()
-            this.$refs.rdrawer.closeDrawer()
-          },
-          onReset: function(){
-            this.$refs.form.resetFields()
-          },
-          onRightDrawerClose: function(done){
-            this.$refs.form.resetFields()
-            done()
+        onShowLogs:function(){
+          window.GetAllLogs({}).then(function(resp){
+            if(resp.Code!=0){
+                App.$message({message: "connect fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+                App.connectDisable = false
+            }else{
+              logs = ''
+              resp.Logs.forEach(log => {
+                logs+=log.Text
+              });
+              App.log = logs
+              App.showLogDrawer=true
+            }
+          })
+
+        },
+        onConnectClick: function(){
+
+          App.connectDisable = true
+          console.log(App.accessServerID)
+
+          if(App.accessServerID == ''){
+            App.$message({message: "please select access server",type: 'warning',customClass:'alert'});
+            App.connectDisable = false
+            return
           }
+          var server = null
+          App.servers.forEach(item => {
+            if(item.ID == App.accessServerID){
+              server = item
+            }
+          });
+
+          if(App.connectIcon == 'el-icon-s-promotion'){
+            App.connectStatus = 'Connecting...'
+            window.ConnectAccessServer(server).then(function(resp){
+              if(resp.Code!=0){
+                App.$message({message: "connect fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+                App.connectDisable = false
+              }
+            })
+          }else{
+            window.StopAccessServer({}).then(function(resp){})
+          }
+        }, 
+        loadAllServers:function(callback){
+          window.GetAllAccessServer({}).then(function(resp){
+            if(resp.Code != 0){
+              App.$message({message: "load all server fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+              return
+            }
+            servers = []
+            resp.Servers.forEach(server => {
+              servers.push({value:server.ID,label:server.Name})
+            });
+            App.options = servers
+            App.servers = resp.Servers
+            if(callback != null){
+              callback()
+            }
+            console.log(App.servers)
+          })
+        },
+        onEditClick: function(ID){
+          var server = null
+          App.servers.forEach(item => {
+            if(item.ID == ID){
+              server = item
+            }
+          });
+
+          if (server!=null) {
+            App.form = server
+          }
+          App.showDelete = true
+          App.showRightDrawer = true
+        }, 
+        resetForm:function(){
+          App.form = {
+            ID:null,
+            Name:'',
+            Endpoint: '',
+            User: '',
+            Password: '',
+            Sni:'',
+            SkipVerifySSL: true,
+            UseRemoteRouteRules: true,
+            LocalRouteRules: '',
+          }
+        },
+        onAddClick: function(){
+          App.resetForm()
+          App.showDelete = false
+          App.showRightDrawer = true
+        }, 
+        onDeleteClick(){
+          
+          window.DeleteAccessServer({ID:App.form.ID}).then(function(resp){
+            console.log(resp)
+            if(resp.Code!=0){
+              App.$message({message: "delete fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+            }
+            App.loadAllServers()
+          })
+          if(App.accessServerID == App.form.ID){
+            App.accessServerID = ''
+          }
+          App.$refs.rdrawer.closeDrawer()
+        },
+        onSubmit: function(){
+
+          App.$refs.form.validate((valid) => {
+          if (valid) {
+            if (this.form.ID == null){
+                window.AddAccessServer(this.form).then(function(resp){
+                  if(resp.Code!=0){
+                    App.$message({message: "add fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+                  }
+                })
+              }else{
+                window.UpdateAccessServer(this.form).then(function(resp){
+                  if(resp.Code!=0){
+                    App.$message({message: "add fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+                  }
+                })
+              }
+              App.loadAllServers()
+              App.resetForm()
+              App.$refs.rdrawer.closeDrawer()
+            } else {
+              App.$message({message: "please fillout correctly",type: 'warning',customClass:'alert'});
+              return false;
+            }
+          });
+        },
+        onReset: function(){
+          App.$refs.form.resetFields()
+        },
+        onRightDrawerClose: function(done){
+          App.resetForm()
+          done()
+        },
+        onCallback(msg){
+          if(msg.event == 'started'){
+            App.$message({message: "Access server connected",type: 'warning',customClass:'alert'});
+            App.connectIcon = 'el-icon-success'
+            App.connectDisable = false
+            App.connectStatus = ''
+            App.connectTips = 'Stop Access Server'
+
+          }else if(msg.event == 'stoped'){
+            App.$message({message: "Access server stopped",type: 'warning',customClass:'alert'});
+            App.localIp = ''
+            App.remoteIp = ''
+            App.connectIcon = 'el-icon-s-promotion'
+            App.connectDisable = false
+            App.connectStatus = ''
+            App.connectTips = 'Connect To Access Server'
+
+          }else if(msg.event == "allocated"){
+
+            App.localIp = 'LocalIP: ' +msg.data.ip
+            App.remoteIp = 'RemoteIP: ' +msg.data.remoteIp
+
+          }else if (msg.event == "error"){
+            App.$message({message: "vpn error,"+msg.data.error,type: 'warning',customClass:'alert'});
+          }else{
+            console.log(msg)
+          }
+        }
       }
     })
   </script>
@@ -144,7 +378,10 @@
       height: 100%;
       margin: auto;
     }
- 
+    
+    .alert {
+      min-width: 90%;
+    }
     .el-button-connect {
       margin-top: 80px;
       height: 120px;
