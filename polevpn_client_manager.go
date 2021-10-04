@@ -51,6 +51,7 @@ func (pcm *PoleVPNClientManager) eventHandler(event int, client *core.PoleVpnCli
 				if err != nil {
 					glog.Error("set tun network fail,", err)
 					client.Stop()
+					return
 				}
 			}
 			av.Set("remoteIp", client.GetRemoteIP())
@@ -58,6 +59,7 @@ func (pcm *PoleVPNClientManager) eventHandler(event int, client *core.PoleVpnCli
 			if err != nil {
 				glog.Error("set network fail,", err)
 				client.Stop()
+				return
 			}
 			if pcm.callback != nil {
 				pcm.callback(anyvalue.New().Set("event", "allocated").Set("data", av.AsMap()))
@@ -88,6 +90,17 @@ func (pcm *PoleVPNClientManager) eventHandler(event int, client *core.PoleVpnCli
 		}
 	case core.CLIENT_EVENT_STARTED:
 		glog.Info("client started")
+
+		var err error
+		pcm.device, err = core.NewTunDevice()
+		if err != nil {
+			glog.Error("create device fail,", err)
+			client.Stop()
+			return
+		}
+
+		client.AttachTunDevice(pcm.device)
+
 		if pcm.callback != nil {
 			pcm.callback(anyvalue.New().Set("event", "started").Set("data", nil))
 		}
@@ -119,12 +132,6 @@ func (pcm *PoleVPNClientManager) Start(server AccessServer) error {
 		return err
 	}
 
-	pcm.device, err = core.NewTunDevice()
-	if err != nil {
-		glog.Error("create device fail,", err)
-		return err
-	}
-
 	if runtime.GOOS == "darwin" {
 		pcm.networkmgr = core.NewDarwinNetworkManager()
 	} else if runtime.GOOS == "linux" {
@@ -136,9 +143,9 @@ func (pcm *PoleVPNClientManager) Start(server AccessServer) error {
 	}
 
 	pcm.client.SetEventHandler(pcm.eventHandler)
-	pcm.client.AttachTunDevice(pcm.device)
 
 	go pcm.client.Start(server.Endpoint, server.User, server.Password, server.Sni, server.SkipVerifySSL)
+
 	pcm.started = true
 	return nil
 }

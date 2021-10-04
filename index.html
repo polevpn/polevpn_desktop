@@ -30,7 +30,7 @@
     })
   </script>
 </head>
-<body oncontextmenu="return false">
+<body oncontextmenu="return false" style="overflow: hidden;">
   <div id="app">
     <el-container direction="vertical">
       <el-header>
@@ -81,7 +81,7 @@
     </el-container>
 
     <el-drawer title="Logs" size="100%" :append-to-body="true" :visible.sync="showLogDrawer">
-      <textarea style="height: 100%;width: 100%;">{{log}}</textarea>
+      <textarea style="height: 99.3%;width: 100%;border-width: 0;">{{log}}</textarea>
     </el-drawer>
 
     <el-drawer title="About" size="100%" :append-to-body="true" :visible.sync="showAboutDrawer">
