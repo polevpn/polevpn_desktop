@@ -48,7 +48,11 @@ func (c *Controller) ConnectAccessServer(req ReqConnectAccessServer) *RespConnec
 
 func (c *Controller) StopAccessServer(req ReqStopAccessServer) *RespStopAccessServer {
 	resp := &RespStopAccessServer{ErrorCode: ErrorCode{Code: 0, Msg: "ok"}}
-	c.manager.Stop()
+	err := c.manager.Stop()
+	if err != nil {
+		resp.Code = -1
+		resp.Msg = err.Error()
+	}
 	return resp
 }
 

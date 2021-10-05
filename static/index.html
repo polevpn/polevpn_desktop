@@ -242,7 +242,12 @@
               }
             })
           }else{
-            window.StopAccessServer({}).then(function(resp){})
+            window.StopAccessServer({}).then(function(resp){
+              if(resp.Code!=0){
+                App.$message({message: "stop tail,"+resp.Msg,type: 'warning',customClass:'alert'});
+                App.connectDisable = false
+              }
+            })
           }
         }, 
         loadAllServers:function(callback){
@@ -350,7 +355,7 @@
             App.$message({message: "Access server connected",type: 'warning',customClass:'alert'});
             App.connectIcon = 'el-icon-success'
             App.connectDisable = false
-            App.connectStatus = ''
+            App.connectStatus = 'Allocating IP Address...'
             App.connectTips = 'Disconnect From Access Server'
 
           }else if(msg.event == 'stoped'){
@@ -364,6 +369,7 @@
 
           }else if(msg.event == "allocated"){
 
+            App.connectStatus = ''
             App.localIp = 'LocalIP: ' +msg.data.ip
             App.remoteIp = 'RemoteIP: ' +msg.data.remoteIp
 

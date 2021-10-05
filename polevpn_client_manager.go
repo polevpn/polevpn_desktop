@@ -10,9 +10,15 @@ import (
 	core "github.com/polevpn/polevpn_core"
 )
 
+const (
+	CLIENT_STOPPED  = 0
+	CLIENT_STARTING = 1
+	CLIENT_STARTED  = 2
+)
+
 type PoleVPNClientManager struct {
 	mutex      *sync.Mutex
-	started    bool
+	status     int
 	client     *core.PoleVpnClient
 	server     AccessServer
 	networkmgr core.NetworkManager
@@ -23,7 +29,7 @@ type PoleVPNClientManager struct {
 func NewPoleVPNClientManager(callback func(av *anyvalue.AnyValue)) *PoleVPNClientManager {
 	return &PoleVPNClientManager{
 		mutex:    &sync.Mutex{},
-		started:  false,
+		status:   CLIENT_STOPPED,
 		callback: callback,
 	}
 }
@@ -33,6 +39,11 @@ func (pcm *PoleVPNClientManager) eventHandler(event int, client *core.PoleVpnCli
 	switch event {
 	case core.CLIENT_EVENT_ADDRESS_ALLOCED:
 		{
+			pcm.mutex.Lock()
+			defer pcm.mutex.Unlock()
+
+			pcm.status = CLIENT_STARTED
+
 			var err error
 			var routes []string
 
@@ -72,7 +83,7 @@ func (pcm *PoleVPNClientManager) eventHandler(event int, client *core.PoleVpnCli
 			if pcm.callback != nil {
 				pcm.callback(anyvalue.New().Set("event", "stoped").Set("data", nil))
 			}
-			pcm.started = false
+			pcm.status = CLIENT_STOPPED
 		}
 	case core.CLIENT_EVENT_RECONNECTED:
 		glog.Info("client reconnected")
@@ -126,9 +137,11 @@ func (pcm *PoleVPNClientManager) Start(server AccessServer) error {
 	pcm.mutex.Lock()
 	defer pcm.mutex.Unlock()
 
-	if pcm.started {
+	if pcm.status != CLIENT_STOPPED {
 		return errors.New("client have started")
 	}
+
+	pcm.status = CLIENT_STARTING
 
 	glog.Info("Connect to ", server.Endpoint)
 
@@ -155,20 +168,20 @@ func (pcm *PoleVPNClientManager) Start(server AccessServer) error {
 
 	go pcm.client.Start(server.Endpoint, server.User, server.Password, server.Sni, server.SkipVerifySSL)
 
-	pcm.started = true
 	return nil
 }
 
-func (pcm *PoleVPNClientManager) Stop() {
+func (pcm *PoleVPNClientManager) Stop() error {
 	pcm.mutex.Lock()
 	defer pcm.mutex.Unlock()
 
-	if !pcm.started {
-		return
+	if pcm.status != CLIENT_STARTED {
+		return errors.New("client haven't started")
 	}
 
 	if pcm.client != nil {
 		pcm.client.Stop()
 	}
-	pcm.started = false
+	pcm.status = CLIENT_STOPPED
+	return nil
 }
