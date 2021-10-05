@@ -1,0 +1,8 @@
+	<key>NSHighResolutionCapable</key>
+	<string>True</string>
+	<key>LSUIElement</key>
+	<string>1</string>
+	<key>CFBundleIconFile</key>                
+	<string>polevpn.icns</string>
+	<key>NSPrincipalClass</key>
+	<string>NSApplication</string>
