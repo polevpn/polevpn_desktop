@@ -1,7 +1,9 @@
 package main
 
 import (
+	"embed"
 	"flag"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -26,29 +28,46 @@ func (lh *LogHandler) Write(data []byte) (int, error) {
 func (lh *LogHandler) Flush() {
 }
 
+//go:embed static
+var staticFiles embed.FS
+
 func main() {
 
 	flag.Parse()
-
-	err := InitDB("./config.db")
-
-	if err != nil {
-		glog.Fatal("init db fail,", err)
-	}
 
 	glog = elog.NewEasyLogger("INFO", true, 3, &LogHandler{})
 	defer glog.Flush()
 	core.SetLogger(glog)
 
+	http.Handle("/", http.FileServer(http.FS(staticFiles)))
+
+	go func() {
+		err := http.ListenAndServe("127.0.0.1:35972", nil)
+		if err != nil {
+			glog.Fatal(err)
+		}
+	}()
+
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		glog.Fatal(err)
+	}
+
+	if !fileExist(homeDir + "/.polevpn/") {
+		os.Mkdir(homeDir+"/.polevpn/", 0755)
+	}
+
+	err = InitDB(homeDir + "/.polevpn/config.db")
+
+	if err != nil {
+		glog.Fatal("init db fail,", err)
+	}
+
 	mainView = webview.New(true, true)
 	defer mainView.Destroy()
 	mainView.SetSize(300, 570, webview.HintFixed)
 
-	dir, err := os.Getwd()
-	if err != nil {
-		glog.Fatal("get work directory fail,", err)
-	}
-	mainView.Navigate("file://" + dir + "/index.html")
+	mainView.Navigate("http://127.0.0.1:35972/static/index.html")
 
 	controller = NewController(mainView)
 
@@ -59,7 +78,7 @@ func main() {
 	systray.Register(onReady, func() {
 		mainView.Terminate()
 		controller.StopAccessServer(ReqStopAccessServer{})
-		DeleteTwoDaysAgoLogs()
+		DeleteTwoHoursAgoLogs()
 		glog.Info("exit")
 	})
 
@@ -83,14 +102,9 @@ func signalHandler() {
 
 func onReady() {
 
-	iconData, err := GetIconData("polevpn.ico")
-	if err != nil {
-		glog.Error(err)
-		return
-	}
 	systray.SetTooltip("PoleVPN")
-	systray.SetTemplateIcon(iconData, iconData)
-	systray.SetIcon(iconData)
+	systray.SetTemplateIcon(iconByte, iconByte)
+	systray.SetIcon(iconByte)
 	mShowApp := systray.AddMenuItem("Show PoleVPN", "Show PoleVPN")
 	mQuit := systray.AddMenuItem("Quit", "Quit")
 	go func() {

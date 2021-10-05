@@ -1,14 +1,22 @@
 package main
 
 import (
-	"io/ioutil"
+	_ "embed"
+	"os"
 	"time"
 )
 
-func GetIconData(path string) ([]byte, error) {
-	return ioutil.ReadFile(path)
+//go:embed polevpn.ico
+var iconByte []byte
+
+func getTimeTwoHoursAgo() string {
+	return time.Now().Add(time.Hour * -2).Format("2006-01-02 15:04:05")
 }
 
-func getTimeTwoDaysAgo() string {
-	return time.Now().Add(time.Hour * 48).Format("2006-01-02 15:04:05")
+func fileExist(path string) bool {
+	_, err := os.Stat(path)
+	if err != nil {
+		return os.IsExist(err)
+	}
+	return true
 }

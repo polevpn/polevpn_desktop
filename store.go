@@ -38,6 +38,9 @@ func InitDB(path string) error {
 }
 
 func AddLog(text string) error {
+	if Db == nil {
+		return nil
+	}
 	ret := Db.Create(&Logs{Text: text})
 	if ret.Error != nil {
 		return ret.Error
@@ -54,8 +57,8 @@ func GetAllLogs() ([]Logs, error) {
 	return records, nil
 }
 
-func DeleteTwoDaysAgoLogs() error {
-	ret := Db.Exec("delete from logs where created_at='" + getTimeTwoDaysAgo() + "'")
+func DeleteTwoHoursAgoLogs() error {
+	ret := Db.Exec("delete from logs where created_at<'" + getTimeTwoHoursAgo() + "'")
 	if ret.Error != nil {
 		return ret.Error
 	}

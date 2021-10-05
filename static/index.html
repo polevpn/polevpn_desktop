@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <link rel="stylesheet" href="./element-ui/lib/theme-chalk/index.css"/>
+  <script src="shortcut.js"></script>
+</head>
+<body oncontextmenu="return false" style="overflow: hidden;">
+  <div id="app">
+    <el-container direction="vertical">
+      <el-header>
+        <span class="header-text">PoleVPN</span>
+        <i class="el-icon-s-unfold" style="cursor: pointer;"  @click="showLeftDrawer = true"></i>
+        <i class="el-icon-plus" title="Add Access Server" style="cursor: pointer;" @click="onAddClick"></i>
+      </el-header>
+      <el-main>
+        <el-select v-model="accessServerID" style="margin-top:30px;" placeholder="Select Access Server">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
+            <span style="float: left">{{ item.label }}</span>
+            <span style="float: right;font-size: 16px;">           
+              <i class="el-icon-edit-outline"  @click="onEditClick(item.value)"></i>
+            </span>
+          </el-option>
+        </el-select>
+        <el-tooltip class="item" effect="light" :content="connectTips" :hide-after="1000" placement="top">
+        <el-button class="el-button-connect" :icon="connectIcon" @click="onConnectClick" :disabled="connectDisable" circle></el-button>
+        </el-tooltip>
+        <div style="margin-top: 40px;line-height: 30px;">{{remoteIp}}</div>
+        <div style="line-height: 30px;">{{localIp}}</div>
+        <div style="line-height: 30px;">{{connectStatus}}</div>
+      </el-main>
+      <el-footer>
+        <span class="footer-upload">Upload: {{upBytes}}  <i class="el-icon-top"></i></span>
+        <span class="footer-download">Download: {{downBytes}}  <i class="el-icon-bottom"></i></span>
+      </el-footer>
+    </el-container>
+
+    <el-drawer size="70%" style="text-align: center;" title="PoleVPN" :visible.sync="showLeftDrawer" :direction="leftDirection">
+    <el-container>
+      <el-main>
+        <div style="font-size: 14px;background-color: #fff; line-height: 60px;">Fast Security Reliable</div>
+        <div style="text-align: left;margin-top: 1px;">
+          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'" @click="onShowLogs"  class="setting-menu">
+            <i class="el-icon-document"></i> Logs
+          </div>
+          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'" @click="showAboutDrawer=true"  class="setting-menu">
+            <i class="el-icon-info"></i> About
+          </div>
+          <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'" @click="showHelpDrawer=true"  class="setting-menu">
+            <i class="el-icon-question"></i> Help
+          </div>
+  
+        </div>
+      </el-main>
+      <el-footer>
+        <div style="text-align: center;line-height: 60px;font-size: 14px;">Version: 1.0.11</div>
+      </el-footer>
+    </el-container>
+
+    <el-drawer title="Logs" size="100%" :append-to-body="true" :visible.sync="showLogDrawer">
+      <textarea style="height: 99.3%;width: 100%;border-width: 0;background-color: #eee;">{{log}}</textarea>
+    </el-drawer>
+
+    <el-drawer title="About" size="100%" :append-to-body="true" :visible.sync="showAboutDrawer">
+      <iframe src="about.html" frameborder=0  marginheight=0 marginwidth=0 style="width: 100%;height: 99.3%;"></iframe>
+    </el-drawer>
+
+    <el-drawer title="Help" size="100%" :append-to-body="true" :visible.sync="showHelpDrawer">
+      <iframe src="help.html" frameborder=0  marginheight=0 marginwidth=0 style="width: 100%;height: 99.3%;"></iframe>
+    </el-drawer>
+
+    </el-drawer>
+
+    <el-drawer  ref="rdrawer" size="100%" title="Add Access Server" :visible.sync="showRightDrawer" :direction="rightDirection" destroy-on-close :before-close="onRightDrawerClose" >
+      <div class="el-drawer-right">
+        <el-form ref="form" size="small" :model="form" :rules="rules" label-width="80px" label-position="top">
+          <el-form-item label="Name" prop="Name">
+            <el-input v-model="form.Name" placeholder="server name"></el-input>
+          </el-form-item>
+          <el-form-item label="Endpoint" prop="Endpoint">
+            <el-input v-model="form.Endpoint" placeholder="start with wss:// or quic://"></el-input>
+          </el-form-item>
+          <el-form-item label="User" prop="User">
+            <el-input v-model="form.User"></el-input>
+          </el-form-item>
+          <el-form-item label="Password" prop="Password">
+            <el-input v-model="form.Password" minlength="6" maxlength="16" show-password></el-input>
+          </el-form-item>
+          <el-form-item label="Skip SSL Verify" prop="SkipVerifySSL">
+            <el-switch v-model="form.SkipVerifySSL"></el-switch>
+          </el-form-item>
+          <el-form-item label="Use Remote Route Rules" prop="UseRemoteRouteRules">
+            <el-switch v-model="form.UseRemoteRouteRules"></el-switch>
+          </el-form-item>
+          <el-form-item label="Sni (option)" prop="Sni">
+            <el-input v-model="form.Sni"></el-input>
+          </el-form-item>
+          <el-form-item label="Local Route Rules (option)" prop="LocalRouteRules">
+            <el-input v-model="form.LocalRouteRules" rows="4" type="textarea" placeholder="10.8.0.0/8,172.31.0.0/16"></el-input>
+          </el-form-item>
+          <el-form-item>
+            <el-button type="primary" plain @click="onSubmit">Save</el-button>
+            <el-button type="primary" plain @click="onDeleteClick" v-show="showDelete" >Delete</el-button>
+            <el-button @click="onReset">Reset</el-button>
+
+          </el-form-item>
+        </el-form>
+      </div>
+    </el-drawer>
+
+  </div>
+</body>
+  <script src="./vue.js"></script>
+  <script src="./element-ui/lib/index.js"></script>
+  <script src="./element-ui/lib/umd/locale/en.js"></script>
+  <script>
+      ELEMENT.locale(ELEMENT.lang.en)    
+      var App = new Vue({
+      el: '#app',
+      data: { 
+        log:'',
+        upBytes:' 0KB',
+        downBytes:'0KB',
+        options:[],
+        accessServerID: '',
+        connectIcon:'el-icon-s-promotion',
+        connectTips:'Connect To Access Server',
+        showLeftDrawer: false,
+        showRightDrawer: false,
+        showLogDrawer:false,
+        showAboutDrawer:false,
+        showHelpDrawer:false,
+        showDelete: false,
+        showAlert:false,
+        leftDirection: 'ltr',
+        rightDirection: 'rtl',
+        form: {
+          ID:null,
+          Name:'',
+          Endpoint: '',
+          User: '',
+          Password: '',
+          Sni:'',
+          SkipVerifySSL: true,
+          UseRemoteRouteRules: true,
+          LocalRouteRules: '',
+        },
+        rules: {
+          Name: [
+            { required: true, message: 'Name can not be empty', trigger: 'blur' },
+            { min: 3, max: 32, message: 'length must to be 3 to 32', trigger: 'blur' }
+          ],
+          Endpoint: [
+            { required: true, message: 'Enpoint can not be empty', trigger: 'blur' }
+          ],
+          User: [
+            { required: true, message: 'User can not be empty', trigger: 'blur' },
+            { min: 3, max: 32, message: 'length must to be 3 to 32', trigger: 'blur' }          
+          ],
+          Password: [
+            { required: true, message: 'Password can not be empty', trigger: 'blur' },
+            { min: 6, max: 16, message: 'length must to be 6 to 16', trigger: 'blur' }          
+          ],
+        },
+        servers:[],
+        localIp:'',
+        remoteIp:'',
+        connectDisable:false,
+        connectStatus:'Disconneted'
+      },
+      mounted:function(){
+        this.loadAllServers(function(){
+          if(App.accessServerID == '' && App.servers.length > 0){
+            App.accessServerID = App.servers[0].ID
+          }
+        })
+
+        setInterval(function(){
+          window.GetUpDownBytes({}).then(function(resp){
+            if (resp.UpBytes < 1024){
+              App.upBytes = "0KB"
+            }else if (resp.UpBytes >= 1024 && resp.UpBytes < 1024*1024) {
+              App.upBytes = (resp.UpBytes/1024).toFixed(2) +"KB"
+            }else if (resp.UpBytes >= 1024*1024 && resp.UpBytes < 1024*1024*1024){
+              App.upBytes = (resp.UpBytes/1024/1024).toFixed(2) +"MB"
+            }else {
+              App.upBytes = (resp.UpBytes/1024/1024/1024).toFixed(2) +"GB"
+            }
+
+            if (resp.DownBytes < 1024){
+              App.downBytes = "0KB"
+            }else if (resp.DownBytes >= 1024 && resp.DownBytes < 1024*1024) {
+              App.downBytes = (resp.DownBytes/1024).toFixed(2) +"KB"
+            }else if (resp.DownBytes >= 1024*1024 && resp.DownBytes < 1024*1024*1024){
+              App.downBytes = (resp.DownBytes/1024/1024).toFixed(2) +"MB"
+            }else {
+              App.downBytes = (resp.DownBytes/1024/1024/1024).toFixed(2) +"GB"
+            }
+          })
+        },5000)
+      },
+      methods:{
+        onShowLogs:function(){
+          window.GetAllLogs({}).then(function(resp){
+            if(resp.Code!=0){
+                App.$message({message: "connect fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+                App.connectDisable = false
+            }else{
+              logs = ''
+              resp.Logs.forEach(log => {
+                logs+=log.Text
+              });
+              App.log = logs
+            }
+
+          })
+          App.showLogDrawer=true
+        },
+        onConnectClick: function(){
+
+          App.connectDisable = true
+          console.log(App.accessServerID)
+
+          if(App.accessServerID == ''){
+            App.$message({message: "please select access server",type: 'warning',customClass:'alert'});
+            App.connectDisable = false
+            return
+          }
+          var server = null
+          App.servers.forEach(item => {
+            if(item.ID == App.accessServerID){
+              server = item
+            }
+          });
+
+          if(App.connectIcon == 'el-icon-s-promotion'){
+            App.connectStatus = 'Connecting...'
+            window.ConnectAccessServer(server).then(function(resp){
+              if(resp.Code!=0){
+                App.$message({message: "connect fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+                App.connectDisable = false
+              }
+            })
+          }else{
+            window.StopAccessServer({}).then(function(resp){})
+          }
+        }, 
+        loadAllServers:function(callback){
+          window.GetAllAccessServer({}).then(function(resp){
+            if(resp.Code != 0){
+              App.$message({message: "load all server fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+              return
+            }
+            servers = []
+            resp.Servers.forEach(server => {
+              servers.push({value:server.ID,label:server.Name})
+            });
+            App.options = servers
+            App.servers = resp.Servers
+            if(callback != null){
+              callback()
+            }
+          })
+        },
+        onEditClick: function(ID){
+          var server = null
+          App.servers.forEach(item => {
+            if(item.ID == ID){
+              server = item
+            }
+          });
+
+          if (server!=null) {
+            App.form = server
+          }
+          App.showDelete = true
+          App.showRightDrawer = true
+        }, 
+        resetForm:function(){
+          App.form = {
+            ID:null,
+            Name:'',
+            Endpoint: '',
+            User: '',
+            Password: '',
+            Sni:'',
+            SkipVerifySSL: true,
+            UseRemoteRouteRules: true,
+            LocalRouteRules: '',
+          }
+        },
+        onAddClick: function(){
+          App.resetForm()
+          App.showDelete = false
+          App.showRightDrawer = true
+        }, 
+        onDeleteClick(){
+          
+          window.DeleteAccessServer({ID:App.form.ID}).then(function(resp){
+            console.log(resp)
+            if(resp.Code!=0){
+              App.$message({message: "delete fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+            }
+            App.loadAllServers()
+          })
+          if(App.accessServerID == App.form.ID){
+            App.accessServerID = ''
+          }
+          App.$refs.rdrawer.closeDrawer()
+        },
+        onSubmit: function(){
+
+          App.$refs.form.validate((valid) => {
+          if (valid) {
+            if (this.form.ID == null){
+                window.AddAccessServer(this.form).then(function(resp){
+                  if(resp.Code!=0){
+                    App.$message({message: "add fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+                  }
+                })
+              }else{
+                window.UpdateAccessServer(this.form).then(function(resp){
+                  if(resp.Code!=0){
+                    App.$message({message: "add fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+                  }
+                })
+              }
+              App.loadAllServers(function(){
+                if(App.accessServerID == '' && App.servers.length > 0){
+                  App.accessServerID = App.servers[0].ID
+                }
+              })
+              App.resetForm()
+              App.$refs.rdrawer.closeDrawer()
+            } else {
+              App.$message({message: "please fillout correctly",type: 'warning',customClass:'alert'});
+              return false;
+            }
+          });
+        },
+        onReset: function(){
+          App.$refs.form.resetFields()
+        },
+        onRightDrawerClose: function(done){
+          App.resetForm()
+          done()
+        },
+        onCallback(msg){
+          if(msg.event == 'started'){
+            App.$message({message: "Access server connected",type: 'warning',customClass:'alert'});
+            App.connectIcon = 'el-icon-success'
+            App.connectDisable = false
+            App.connectStatus = ''
+            App.connectTips = 'Disconnect From Access Server'
+
+          }else if(msg.event == 'stoped'){
+            App.$message({message: "Access server stopped",type: 'warning',customClass:'alert'});
+            App.localIp = ''
+            App.remoteIp = ''
+            App.connectIcon = 'el-icon-s-promotion'
+            App.connectDisable = false
+            App.connectStatus = 'Disconnected'
+            App.connectTips = 'Connect To Access Server'
+
+          }else if(msg.event == "allocated"){
+
+            App.localIp = 'LocalIP: ' +msg.data.ip
+            App.remoteIp = 'RemoteIP: ' +msg.data.remoteIp
+
+          }else if (msg.event == "error"){
+            App.$message({message: "vpn error,"+msg.data.error,type: 'warning',customClass:'alert'});
+          }else{
+            console.log(msg)
+          }
+        }
+      }
+    })
+  </script>
+  <style>
+    html,body,#app,.el-container,.el-drawer {
+    height: 100%;
+    margin: auto;
+    }
+      
+    .alert {
+    min-width: 90%;
+    }
+    .el-button-connect {
+    margin-top: 80px;
+    height: 120px;
+    width: 120px;
+    font-size: 40px;
+    border: 4px;
+    color: blueviolet;
+    box-shadow:0px 0px 10px #666;
+    }
+
+    .el-header, .el-footer {
+    text-align: center;
+    line-height: 60px;
+    padding: 0px 10px 0px 10px;
+    background-color: #fff;
+    }  
+
+    .el-header{
+    font-size: 30px;
+    }
+
+    .el-drawer {
+    background-color: #eee;
+    padding: 0px 0px 0px 0px;
+    }
+
+    .el-drawer__header{
+    padding: 0px 10px 0px 10px;
+    margin-bottom: 0px;
+    font-weight: bold;
+    background-color: #fff;
+    height: 60px;
+    }
+    .el-drawer-right {
+    padding: 10px;
+    }
+
+    .setting-menu {
+    padding-left:10px;
+    line-height: 40px;
+    cursor:pointer;
+    border-bottom-color: #fff;
+    border-bottom-width: 1px;
+    border-bottom-style:solid;
+    }
+
+    .el-main {
+    background-color: #eee;
+    color: #666;
+    text-align: center;
+    padding: 0px 0px 0px 0px;
+    }
+
+    .el-footer {
+    font-size: 12px;
+    }
+
+    .footer-upload {
+    float: left;
+    }
+
+    .footer-download {
+    float: right;
+    }
+
+    .header-text {
+    font-size: 24px;
+    }
+
+    .el-icon-s-unfold {
+    float: left;
+    line-height: 60px;
+    color: #666;
+    }
+
+    .el-icon-plus {
+    float: right;
+    line-height: 60px;
+    color: #666;
+    }
+
+  </style>
+</html>
