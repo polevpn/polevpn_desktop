@@ -375,6 +375,12 @@
 
           }else if (msg.event == "error"){
             App.$message({message: "vpn error,"+msg.data.error,type: 'warning',customClass:'alert'});
+          }else if (msg.event == "reconnecting"){
+            App.$message({message: "Network disconnected,reconnecting",type: 'warning',customClass:'alert'});
+          }else if (msg.event == "reconnected"){
+            App.$message({message: "Network reconnected",type: 'warning',customClass:'alert'});
+          }else if (msg.event == "error"){
+            App.$message({message: "vpn error,"+msg.data.error,type: 'warning',customClass:'alert'});
           }else{
             console.log(msg)
           }
