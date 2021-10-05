@@ -25,6 +25,7 @@ func (c *Controller) Bind() {
 	c.view.Bind("DeleteAccessServer", c.DeleteAccessServer)
 	c.view.Bind("GetAllAccessServer", c.GetAllAccessServer)
 	c.view.Bind("GetAllLogs", c.GetAllLogs)
+	c.view.Bind("GetUpDownBytes", c.GetUpDownBytes)
 
 }
 
@@ -104,5 +105,12 @@ func (c *Controller) GetAllLogs(req ReqGetAllLogs) *RespGetAllLogs {
 		resp.Msg = err.Error()
 	}
 	resp.Logs = logs
+	return resp
+}
+
+func (c *Controller) GetUpDownBytes(req ReqGetUpDownBytes) *RespGetUpDownBytes {
+
+	resp := &RespGetUpDownBytes{ErrorCode: ErrorCode{Code: 0, Msg: "ok"}}
+	resp.UpBytes, resp.DownBytes = c.manager.GetUpDownBytes()
 	return resp
 }

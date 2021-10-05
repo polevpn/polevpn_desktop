@@ -59,3 +59,12 @@ type RespGetAllLogs struct {
 	Logs []Logs
 	ErrorCode
 }
+
+type ReqGetUpDownBytes struct {
+}
+
+type RespGetUpDownBytes struct {
+	UpBytes   uint64
+	DownBytes uint64
+	ErrorCode
+}

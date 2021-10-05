@@ -115,6 +115,13 @@ func (pcm *PoleVPNClientManager) eventHandler(event int, client *core.PoleVpnCli
 
 }
 
+func (pcm *PoleVPNClientManager) GetUpDownBytes() (uint64, uint64) {
+	if pcm.client != nil {
+		return pcm.client.GetUpDownBytes()
+	}
+	return 0, 0
+}
+
 func (pcm *PoleVPNClientManager) Start(server AccessServer) error {
 	pcm.mutex.Lock()
 	defer pcm.mutex.Unlock()

@@ -2,33 +2,8 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <!-- import CSS -->
-  <link rel="stylesheet" href="./element-ui/lib/theme-chalk/index.css">
-  <script>
-    //shortcut for macos
-    window.addEventListener("keypress", (event) => {  
-        if (event.metaKey && event.key === 'c') {
-          document.execCommand("copy")
-          event.preventDefault();
-        }
-        if (event.metaKey && event.key === 'v') {
-          document.execCommand("paste")
-          event.preventDefault();
-        }        
-        if (event.metaKey && event.key === 'x') {
-          document.execCommand("cut")
-          event.preventDefault();
-        }
-        if (event.metaKey && event.key === 'z') {
-          document.execCommand("undo")
-          event.preventDefault();
-        }
-        if (event.metaKey && event.key === 'a') {
-          document.execCommand("selectAll")
-          event.preventDefault();
-        }
-    })
-  </script>
+  <link rel="stylesheet" href="./element-ui/lib/theme-chalk/index.css"/>
+  <script src="shortcut.js"></script>
 </head>
 <body oncontextmenu="return false" style="overflow: hidden;">
   <div id="app">
@@ -55,8 +30,8 @@
         <div style="line-height: 30px;">{{connectStatus}}</div>
       </el-main>
       <el-footer>
-        <span class="footer-upload">Upload: 250KB</span>
-        <span class="footer-download">Download: 250KB</span>
+        <span class="footer-upload">Upload: {{upBytes}}  <i class="el-icon-top"></i></span>
+        <span class="footer-download">Download: {{downBytes}}  <i class="el-icon-bottom"></i></span>
       </el-footer>
     </el-container>
 
@@ -85,11 +60,11 @@
     </el-drawer>
 
     <el-drawer title="About" size="100%" :append-to-body="true" :visible.sync="showAboutDrawer">
-      <p>{{about}}</p>
+      <iframe src="about.html" frameborder=0  marginheight=0 marginwidth=0 style="width: 100%;height: 99.3%;"></iframe>
     </el-drawer>
 
     <el-drawer title="Help" size="100%" :append-to-body="true" :visible.sync="showHelpDrawer">
-      <p>{{help}}</p>
+      <iframe src="help.html" frameborder=0  marginheight=0 marginwidth=0 style="width: 100%;height: 99.3%;"></iframe>
     </el-drawer>
 
     </el-drawer>
@@ -133,18 +108,17 @@
 
   </div>
 </body>
-  <!-- import Vue before Element -->
   <script src="./vue.js"></script>
-  <!-- import JavaScript -->
   <script src="./element-ui/lib/index.js"></script>
+  <script src="./element-ui/lib/umd/locale/en.js"></script>
   <script>
-
-    var App = new Vue({
+      ELEMENT.locale(ELEMENT.lang.en)    
+      var App = new Vue({
       el: '#app',
       data: { 
         log:'',
-        about:'',
-        help:'',
+        upBytes:' 0KB',
+        downBytes:'0KB',
         options:[],
         accessServerID: '',
         connectIcon:'el-icon-s-promotion',
@@ -190,7 +164,7 @@
         localIp:'',
         remoteIp:'',
         connectDisable:false,
-        connectStatus:''
+        connectStatus:'Disconneted'
       },
       mounted:function(){
         this.loadAllServers(function(){
@@ -198,6 +172,30 @@
             App.accessServerID = App.servers[0].ID
           }
         })
+
+        setInterval(function(){
+          window.GetUpDownBytes({}).then(function(resp){
+            if (resp.UpBytes < 1024){
+              App.upBytes = "0KB"
+            }else if (resp.UpBytes >= 1024 && resp.UpBytes < 1024*1024) {
+              App.upBytes = (resp.UpBytes/1024).toFixed(2) +"KB"
+            }else if (resp.UpBytes >= 1024*1024 && resp.UpBytes < 1024*1024*1024){
+              App.upBytes = (resp.UpBytes/1024/1024).toFixed(2) +"MB"
+            }else {
+              App.upBytes = (resp.UpBytes/1024/1024/1024).toFixed(2) +"GB"
+            }
+
+            if (resp.DownBytes < 1024){
+              App.downBytes = "0KB"
+            }else if (resp.DownBytes >= 1024 && resp.DownBytes < 1024*1024) {
+              App.downBytes = (resp.DownBytes/1024).toFixed(2) +"KB"
+            }else if (resp.DownBytes >= 1024*1024 && resp.DownBytes < 1024*1024*1024){
+              App.downBytes = (resp.DownBytes/1024/1024).toFixed(2) +"MB"
+            }else {
+              App.downBytes = (resp.DownBytes/1024/1024/1024).toFixed(2) +"GB"
+            }
+          })
+        },5000)
       },
       methods:{
         onShowLogs:function(){
@@ -260,7 +258,6 @@
             if(callback != null){
               callback()
             }
-            console.log(App.servers)
           })
         },
         onEditClick: function(ID){
@@ -326,7 +323,11 @@
                   }
                 })
               }
-              App.loadAllServers()
+              App.loadAllServers(function(){
+                if(App.accessServerID == '' && App.servers.length > 0){
+                  App.accessServerID = App.servers[0].ID
+                }
+              })
               App.resetForm()
               App.$refs.rdrawer.closeDrawer()
             } else {
@@ -356,7 +357,7 @@
             App.remoteIp = ''
             App.connectIcon = 'el-icon-s-promotion'
             App.connectDisable = false
-            App.connectStatus = ''
+            App.connectStatus = 'Disconnected'
             App.connectTips = 'Connect To Access Server'
 
           }else if(msg.event == "allocated"){
@@ -375,92 +376,92 @@
   </script>
   <style>
     html,body,#app,.el-container,.el-drawer {
-      height: 100%;
-      margin: auto;
+    height: 100%;
+    margin: auto;
     }
-    
+      
     .alert {
-      min-width: 90%;
+    min-width: 90%;
     }
     .el-button-connect {
-      margin-top: 80px;
-      height: 120px;
-      width: 120px;
-      font-size: 40px;
-      border: 4px;
-      color: blueviolet;
-      box-shadow:0px 0px 10px #666;
+    margin-top: 80px;
+    height: 120px;
+    width: 120px;
+    font-size: 40px;
+    border: 4px;
+    color: blueviolet;
+    box-shadow:0px 0px 10px #666;
     }
 
     .el-header, .el-footer {
-      text-align: center;
-      line-height: 60px;
-      padding: 0px 10px 0px 10px;
-      background-color: #fff;
+    text-align: center;
+    line-height: 60px;
+    padding: 0px 10px 0px 10px;
+    background-color: #fff;
     }  
 
     .el-header{
-      font-size: 30px;
+    font-size: 30px;
     }
 
     .el-drawer {
-      background-color: #eee;
-      padding: 0px 0px 0px 0px;
+    background-color: #eee;
+    padding: 0px 0px 0px 0px;
     }
 
     .el-drawer__header{
-      padding: 0px 10px 0px 10px;
-      margin-bottom: 0px;
-      font-weight: bold;
-      background-color: #fff;
-      height: 60px;
+    padding: 0px 10px 0px 10px;
+    margin-bottom: 0px;
+    font-weight: bold;
+    background-color: #fff;
+    height: 60px;
     }
     .el-drawer-right {
-      padding: 10px;
+    padding: 10px;
     }
 
     .setting-menu {
-      padding-left:10px;
-      line-height: 40px;
-      cursor:pointer;
-      border-bottom-color: #fff;
-      border-bottom-width: 1px;
-      border-bottom-style:solid;
+    padding-left:10px;
+    line-height: 40px;
+    cursor:pointer;
+    border-bottom-color: #fff;
+    border-bottom-width: 1px;
+    border-bottom-style:solid;
     }
 
     .el-main {
-      background-color: #eee;
-      color: #666;
-      text-align: center;
-      padding: 0px 0px 0px 0px;
+    background-color: #eee;
+    color: #666;
+    text-align: center;
+    padding: 0px 0px 0px 0px;
     }
 
     .el-footer {
-      font-size: 12px;
+    font-size: 12px;
     }
 
     .footer-upload {
-      float: left;
+    float: left;
     }
 
     .footer-download {
-      float: right;
+    float: right;
     }
 
     .header-text {
-      font-size: 24px;
+    font-size: 24px;
     }
 
     .el-icon-s-unfold {
-      float: left;
-      line-height: 60px;
-      color: #666;
+    float: left;
+    line-height: 60px;
+    color: #666;
     }
 
     .el-icon-plus {
-      float: right;
-      line-height: 60px;
-      color: #666;
+    float: right;
+    line-height: 60px;
+    color: #666;
     }
 
   </style>
