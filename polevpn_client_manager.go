@@ -95,7 +95,7 @@ func (pcm *PoleVPNClientManager) eventHandler(event int, client *core.PoleVpnCli
 		pcm.device, err = core.NewTunDevice()
 		if err != nil {
 			glog.Error("create device fail,", err)
-			client.Stop()
+			go client.Stop()
 			return
 		}
 
