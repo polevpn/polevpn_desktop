@@ -352,14 +352,14 @@
         },
         onCallback(msg){
           if(msg.event == 'started'){
-            App.$message({message: "Access server connected",type: 'warning',customClass:'alert'});
+            App.$message({message: "Access server connected",type: 'success',customClass:'alert'});
             App.connectIcon = 'el-icon-success'
             App.connectDisable = false
             App.connectStatus = 'Allocating IP Address...'
             App.connectTips = 'Disconnect From Access Server'
 
           }else if(msg.event == 'stoped'){
-            App.$message({message: "Access server stopped",type: 'warning',customClass:'alert'});
+            App.$message({message: "Access server disconnected",type: 'success',customClass:'alert'});
             App.localIp = ''
             App.remoteIp = ''
             App.connectIcon = 'el-icon-s-promotion'
