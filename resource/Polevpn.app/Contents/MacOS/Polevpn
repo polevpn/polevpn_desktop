@@ -3,4 +3,4 @@ WORK_HOME=$(cd $(dirname $BASH_SOURCE) && pwd) || {
     echo Error getting script directory >&2
     exit 1
 }
-/usr/bin/osascript -e "do shell script \"$WORK_HOME/polevpn_desktop.app/polevpn_desktop >/dev/null 2>&1 &\" with prompt \"PoleVPN Request System Privileges\" with administrator privileges"
+/usr/bin/osascript -e "do shell script \"$WORK_HOME/polevpnclient.app/polevpnclient >/dev/null 2>&1 &\" with prompt \"PoleVPN Request System Privileges\" with administrator privileges"
