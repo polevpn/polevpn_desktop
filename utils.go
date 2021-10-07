@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-//go:embed polevpn.ico
+//go:embed resource/polevpn.ico
 var iconByte []byte
 
 func getTimeTwoHoursAgo() string {
