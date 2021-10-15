@@ -2,7 +2,5 @@
 <string>True</string>
 <key>LSUIElement</key>
 <string>1</string>
-<key>CFBundleIconFile</key>                
-<string>Polevpn.icns</string>
 <key>NSPrincipalClass</key>
 <string>NSApplication</string>

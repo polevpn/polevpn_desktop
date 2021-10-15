@@ -136,6 +136,8 @@ github.com/polevpn/anyvalue v1.0.6 h1:IaAtj0ZkOfAqTd1K8rc5JvDt/qFsuivzrI4LXrYC4i
 github.com/polevpn/anyvalue v1.0.6/go.mod h1:SAmPKOT6BtaGar2NZc9u/TUZgDYBXO7lZZ9q1MU0LVk=
 github.com/polevpn/elog v1.1.0 h1:v7h1rvkGYEUdk8CO8GQ3Sefr3QLwY6xg+b9EVe2XA4M=
 github.com/polevpn/elog v1.1.0/go.mod h1:u30sJGFE2hYV+KuEmE4Bw7Qh0J3eXS3AEXjyHtqPDjU=
+github.com/polevpn/elog v1.1.1 h1:+Nnyaajv//fbmVextCGrcFfZXi+isprA1qQag2dcwhE=
+github.com/polevpn/elog v1.1.1/go.mod h1:u30sJGFE2hYV+KuEmE4Bw7Qh0J3eXS3AEXjyHtqPDjU=
 github.com/polevpn/glog v1.1.0 h1:v7h1rvkGYEUdk8CO8GQ3Sefr3QLwY6xg+b9EVe2XA4M=
 github.com/polevpn/glog v1.1.0/go.mod h1:u30sJGFE2hYV+KuEmE4Bw7Qh0J3eXS3AEXjyHtqPDjU=
 github.com/polevpn/h3conn v1.0.10 h1:ZClWkWBCgF1ZbxwsB0c9ZMFQyc3LUze2iTdRTK6wGg8=

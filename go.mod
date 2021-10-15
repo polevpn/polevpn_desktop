@@ -3,8 +3,9 @@ module polevpn_desktop
 go 1.16
 
 require (
+	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/polevpn/anyvalue v1.0.6 // indirect
-	github.com/polevpn/elog v1.1.0
+	github.com/polevpn/elog v1.1.1
 	github.com/polevpn/polevpn_core v1.0.13
 	github.com/polevpn/systray v1.1.1
 	github.com/polevpn/webview v0.1.2

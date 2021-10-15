@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="./element-ui/lib/theme-chalk/index.css"/>
   <script src="shortcut.js"></script>
 </head>
-<body oncontextmenu="return false" style="overflow: hidden;">
+<body style="overflow: hidden;" oncontextmenu="return false">
   <div id="app">
     <el-container direction="vertical">
       <el-header>
@@ -176,44 +176,12 @@
         })
 
         setInterval(function(){
-          window.GetUpDownBytes({}).then(function(resp){
-            if (resp.UpBytes < 1024){
-              App.upBytes = "0KB"
-            }else if (resp.UpBytes >= 1024 && resp.UpBytes < 1024*1024) {
-              App.upBytes = (resp.UpBytes/1024).toFixed(2) +"KB"
-            }else if (resp.UpBytes >= 1024*1024 && resp.UpBytes < 1024*1024*1024){
-              App.upBytes = (resp.UpBytes/1024/1024).toFixed(2) +"MB"
-            }else {
-              App.upBytes = (resp.UpBytes/1024/1024/1024).toFixed(2) +"GB"
-            }
-
-            if (resp.DownBytes < 1024){
-              App.downBytes = "0KB"
-            }else if (resp.DownBytes >= 1024 && resp.DownBytes < 1024*1024) {
-              App.downBytes = (resp.DownBytes/1024).toFixed(2) +"KB"
-            }else if (resp.DownBytes >= 1024*1024 && resp.DownBytes < 1024*1024*1024){
-              App.downBytes = (resp.DownBytes/1024/1024).toFixed(2) +"MB"
-            }else {
-              App.downBytes = (resp.DownBytes/1024/1024/1024).toFixed(2) +"GB"
-            }
-          })
+          window.GetUpDownBytes({}).then(function(resp){})
         },5000)
       },
       methods:{
         onShowLogs:function(){
-          window.GetAllLogs({}).then(function(resp){
-            if(resp.Code!=0){
-                App.$message({message: "connect fail,"+resp.Msg,type: 'warning',customClass:'alert'});
-                App.connectDisable = false
-            }else{
-              logs = ''
-              resp.Logs.forEach(log => {
-                logs+=log.Text
-              });
-              App.log = logs
-            }
-
-          })
+          window.GetAllLogs({}).then(function(resp){})
           App.showLogDrawer=true
         },
         onConnectClick: function(){
@@ -239,6 +207,7 @@
               if(resp.Code!=0){
                 App.$message({message: "connect fail,"+resp.Msg,type: 'warning',customClass:'alert'});
                 App.connectDisable = false
+                App.connectStatus = 'Disconnected'
               }
             })
           }else{
@@ -381,6 +350,28 @@
             App.$message({message: "Network reconnected",type: 'warning',customClass:'alert'});
           }else if (msg.event == "error"){
             App.$message({message: "vpn error,"+msg.data.error,type: 'warning',customClass:'alert'});
+          }else if (msg.event == "bytes"){
+            if (msg.data.UpBytes < 1024){
+              App.upBytes = "0KB"
+            }else if (msg.data.UpBytes >= 1024 && msg.data.UpBytes < 1024*1024) {
+              App.upBytes = (msg.data.UpBytes/1024).toFixed(2) +"KB"
+            }else if (msg.data.UpBytes >= 1024*1024 && msg.data.UpBytes < 1024*1024*1024){
+              App.upBytes = (msg.data.UpBytes/1024/1024).toFixed(2) +"MB"
+            }else {
+              App.upBytes = (msg.data.UpBytes/1024/1024/1024).toFixed(2) +"GB"
+            }
+
+            if (msg.data.DownBytes < 1024){
+              App.downBytes = "0KB"
+            }else if (msg.data.DownBytes >= 1024 && msg.data.DownBytes < 1024*1024) {
+              App.downBytes = (msg.data.DownBytes/1024).toFixed(2) +"KB"
+            }else if (msg.data.DownBytes >= 1024*1024 && msg.data.DownBytes < 1024*1024*1024){
+              App.downBytes = (msg.data.DownBytes/1024/1024).toFixed(2) +"MB"
+            }else {
+              App.downBytes = (msg.data.DownBytes/1024/1024/1024).toFixed(2) +"GB"
+            }
+          } else if (msg.event == "logs") {              
+              App.log = msg.data.logs
           }else{
             console.log(msg)
           }

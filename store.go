@@ -31,37 +31,7 @@ func InitDB(path string) error {
 		return err
 	}
 	db.AutoMigrate(&AccessServer{})
-	db.AutoMigrate(&Logs{})
-
 	Db = db
-	return nil
-}
-
-func AddLog(text string) error {
-	if Db == nil {
-		return nil
-	}
-	ret := Db.Create(&Logs{Text: text})
-	if ret.Error != nil {
-		return ret.Error
-	}
-	return nil
-}
-
-func GetAllLogs() ([]Logs, error) {
-	var records []Logs
-	ret := Db.Find(&records)
-	if ret.Error != nil {
-		return nil, ret.Error
-	}
-	return records, nil
-}
-
-func DeleteTwoHoursAgoLogs() error {
-	ret := Db.Exec("delete from logs where created_at<'" + getTimeTwoHoursAgo() + "'")
-	if ret.Error != nil {
-		return ret.Error
-	}
 	return nil
 }
 

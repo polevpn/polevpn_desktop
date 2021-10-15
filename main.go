@@ -9,24 +9,12 @@ import (
 	"syscall"
 
 	"github.com/polevpn/elog"
-	core "github.com/polevpn/polevpn_core"
 	"github.com/polevpn/systray"
 	"github.com/polevpn/webview"
 )
 
 var mainView webview.WebView
-var controller *Controller
 var glog *elog.EasyLogger
-
-type LogHandler struct {
-}
-
-func (lh *LogHandler) Write(data []byte) (int, error) {
-	return len(data), AddLog(string(data))
-}
-
-func (lh *LogHandler) Flush() {
-}
 
 //go:embed static
 var staticFiles embed.FS
@@ -34,10 +22,24 @@ var staticFiles embed.FS
 func main() {
 
 	flag.Parse()
+	defer elog.Flush()
+	glog = elog.GetLogger()
 
-	glog = elog.NewEasyLogger("INFO", true, 3, &LogHandler{})
-	defer glog.Flush()
-	core.SetLogger(glog)
+	homeDir, err := os.UserHomeDir()
+	if err != nil {
+		glog.Fatal(err)
+	}
+
+	glog.SetLogPath(homeDir + "/.polevpn")
+
+	exist := CheckServiceExist()
+
+	if !exist {
+		err := StartService(homeDir + "/.polevpn")
+		if err != nil {
+			glog.Fatal("start service fail,", err)
+		}
+	}
 
 	http.Handle("/", http.FileServer(http.FS(staticFiles)))
 
@@ -47,11 +49,6 @@ func main() {
 			glog.Fatal(err)
 		}
 	}()
-
-	homeDir, err := os.UserHomeDir()
-	if err != nil {
-		glog.Fatal(err)
-	}
 
 	if !fileExist(homeDir + "/.polevpn/") {
 		os.Mkdir(homeDir+"/.polevpn/", 0755)
@@ -69,7 +66,11 @@ func main() {
 
 	mainView.Navigate("http://127.0.0.1:35972/static/index.html")
 
-	controller = NewController(mainView)
+	controller, err := NewController(mainView)
+
+	if err != nil {
+		glog.Fatal("new controller fail,", err)
+	}
 
 	controller.Bind()
 
@@ -78,7 +79,6 @@ func main() {
 	systray.Register(onReady, func() {
 		mainView.Terminate()
 		controller.StopAccessServer(ReqStopAccessServer{})
-		DeleteTwoHoursAgoLogs()
 		glog.Info("exit")
 	})
 

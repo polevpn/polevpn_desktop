@@ -10,10 +10,16 @@ type Controller struct {
 	view    webview.WebView
 }
 
-func NewController(view webview.WebView) *Controller {
+func NewController(view webview.WebView) (*Controller, error) {
 	controller := &Controller{view: view}
-	controller.manager = NewPoleVPNClientManager(controller.EventCallback)
-	return controller
+
+	manager, err := NewPoleVPNClientManager(controller.EventCallback)
+
+	if err != nil {
+		return nil, err
+	}
+	controller.manager = manager
+	return controller, nil
 }
 
 func (c *Controller) Bind() {
@@ -103,18 +109,13 @@ func (c *Controller) GetAllAccessServer(req ReqGetAllAccessServer) *RespGetAllAc
 func (c *Controller) GetAllLogs(req ReqGetAllLogs) *RespGetAllLogs {
 
 	resp := &RespGetAllLogs{ErrorCode: ErrorCode{Code: 0, Msg: "ok"}}
-	logs, err := GetAllLogs()
-	if err != nil {
-		resp.Code = -1
-		resp.Msg = err.Error()
-	}
-	resp.Logs = logs
+	c.manager.GetLogs()
 	return resp
 }
 
 func (c *Controller) GetUpDownBytes(req ReqGetUpDownBytes) *RespGetUpDownBytes {
 
 	resp := &RespGetUpDownBytes{ErrorCode: ErrorCode{Code: 0, Msg: "ok"}}
-	resp.UpBytes, resp.DownBytes = c.manager.GetUpDownBytes()
+	c.manager.GetUpDownBytes()
 	return resp
 }

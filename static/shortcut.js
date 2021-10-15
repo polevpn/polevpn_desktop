@@ -1,23 +1,23 @@
 //shortcut for macos
 window.addEventListener("keypress", (event) => {  
     if (event.metaKey && event.key === 'c') {
-        document.execCommand("copy")
+        document.execCommand("copy",false)
         event.preventDefault();
     }
     if (event.metaKey && event.key === 'v') {
-        document.execCommand("paste")
+        document.execCommand("paste",false)
         event.preventDefault();
     }        
     if (event.metaKey && event.key === 'x') {
-        document.execCommand("cut")
+        document.execCommand("cut",false)
         event.preventDefault();
     }
     if (event.metaKey && event.key === 'z') {
-        document.execCommand("undo")
+        document.execCommand("undo",false)
         event.preventDefault();
     }
     if (event.metaKey && event.key === 'a') {
-        document.execCommand("selectAll")
+        document.execCommand("selectAll",false)
         event.preventDefault();
     }
 })
