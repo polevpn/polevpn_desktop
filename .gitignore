@@ -1,4 +1,6 @@
 *.log
+polevpn_service
+polevpn_service.exe
 polevpn_desktop
 polevpn_desktop.exe
 build/*
