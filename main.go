@@ -30,12 +30,16 @@ func main() {
 		glog.Fatal(err)
 	}
 
-	glog.SetLogPath(homeDir + "/.polevpn")
+	if !fileExist(homeDir + "/.polevpn/") {
+		os.Mkdir(homeDir+"/.polevpn/", 0755)
+	}
+
+	glog.SetLogPath(homeDir + string(os.PathSeparator) + ".polevpn")
 
 	exist := CheckServiceExist()
 
 	if !exist {
-		err := StartService(homeDir + "/.polevpn")
+		err := StartService(homeDir + string(os.PathSeparator) + ".polevpn")
 		if err != nil {
 			glog.Fatal("start service fail,", err)
 		}
@@ -50,17 +54,13 @@ func main() {
 		}
 	}()
 
-	if !fileExist(homeDir + "/.polevpn/") {
-		os.Mkdir(homeDir+"/.polevpn/", 0755)
-	}
-
 	err = InitDB(homeDir + "/.polevpn/config.db")
 
 	if err != nil {
 		glog.Fatal("init db fail,", err)
 	}
 
-	mainView = webview.New(true, true)
+	mainView = webview.New(300, 570, true, true)
 	defer mainView.Destroy()
 	mainView.SetSize(300, 570, webview.HintFixed)
 

@@ -16,10 +16,6 @@ import (
 //go:embed resource/polevpn.ico
 var iconByte []byte
 
-func getTimeTwoHoursAgo() string {
-	return time.Now().Add(time.Hour * -2).Format("2006-01-02 15:04:05")
-}
-
 func fileExist(path string) bool {
 	_, err := os.Stat(path)
 	if err != nil {
@@ -29,20 +25,36 @@ func fileExist(path string) bool {
 }
 
 func CheckServiceExist() bool {
-	out, err := core.ExecuteCommand("bash", "-c", "pgrep -f \"polevpn_service\"|wc -l")
 
-	if err != nil {
-		glog.Error("check servie fail,", err)
-		return false
+	if runtime.GOOS == "windows" {
+
+		_, err := core.ExecuteCommand("powershell", "get-process", `"polevpn_service"`)
+
+		if err != nil {
+			glog.Error("check servie fail,", err)
+			return false
+		} else {
+			return true
+		}
+
+	} else {
+
+		out, err := core.ExecuteCommand("bash", "-c", "pgrep -f \"polevpn_service\"|wc -l")
+
+		if err != nil {
+			glog.Error("check servie fail,", err)
+			return false
+		}
+
+		exist, err := strconv.Atoi(strings.Trim(string(out), " \r\n"))
+
+		if err != nil {
+			glog.Error("atoi fail,", err)
+			return false
+		}
+		return exist > 0
 	}
 
-	exist, err := strconv.Atoi(strings.Trim(string(out), " \r\n"))
-
-	if err != nil {
-		glog.Error("atoi fail,", err)
-		return false
-	}
-	return exist > 0
 }
 
 func StartService(logPath string) error {
@@ -69,7 +81,7 @@ func StartService(logPath string) error {
 	} else if runtime.GOOS == "windows" {
 
 		go func() {
-			out, err := core.ExecuteCommand(dir+`/service/polevpn_service`, `-logPath=`+logPath)
+			out, err := core.ExecuteCommand(dir+`\service\polevpn_service.exe`, `-logPath=`+logPath)
 			if err != nil {
 				glog.Error("check servie fail,", err.Error()+","+string(out))
 			}
