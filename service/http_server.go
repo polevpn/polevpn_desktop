@@ -33,12 +33,23 @@ func (hs *HttpServer) defaultHandler(w http.ResponseWriter, r *http.Request) {
 	hs.respError(http.StatusForbidden, w)
 }
 
+func (hs *HttpServer) check(w http.ResponseWriter, r *http.Request) {
+	version := r.URL.Query().Get("version")
+	if version != VERSION {
+		glog.Fatal("version not equal,", version, ",", VERSION)
+	} else {
+		w.Write([]byte("ok"))
+	}
+}
+
 func (hs *HttpServer) Listen(addr string) error {
 
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		if r.URL.Path == "/" {
 			hs.wsHandler(w, r)
+		} else if r.URL.Path == "/check" {
+			hs.check(w, r)
 		} else {
 			hs.defaultHandler(w, r)
 		}

@@ -32,6 +32,7 @@ func (c *Controller) Bind() {
 	c.view.Bind("GetAllAccessServer", c.GetAllAccessServer)
 	c.view.Bind("GetAllLogs", c.GetAllLogs)
 	c.view.Bind("GetUpDownBytes", c.GetUpDownBytes)
+	c.view.Bind("GetVersion", c.GetVersion)
 
 }
 
@@ -117,5 +118,12 @@ func (c *Controller) GetUpDownBytes(req ReqGetUpDownBytes) *RespGetUpDownBytes {
 
 	resp := &RespGetUpDownBytes{ErrorCode: ErrorCode{Code: 0, Msg: "ok"}}
 	c.manager.GetUpDownBytes()
+	return resp
+}
+
+func (c *Controller) GetVersion(req ReqGetVersion) *RespGetVersion {
+
+	resp := &RespGetVersion{ErrorCode: ErrorCode{Code: 0, Msg: "ok"}}
+	resp.Version = VERSION
 	return resp
 }

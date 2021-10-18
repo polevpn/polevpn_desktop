@@ -65,3 +65,11 @@ type ReqGetUpDownBytes struct {
 type RespGetUpDownBytes struct {
 	ErrorCode
 }
+
+type ReqGetVersion struct {
+}
+
+type RespGetVersion struct {
+	ErrorCode
+	Version string
+}

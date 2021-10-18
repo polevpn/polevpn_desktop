@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="./element-ui/lib/theme-chalk/index.css"/>
   <script src="shortcut.js"></script>
 </head>
-<body style="overflow: hidden;" oncontextmenu="return false">
+<body style="overflow: hidden;" >
   <div id="app">
     <el-container direction="vertical">
       <el-header>
@@ -53,7 +53,7 @@
         </div>
       </el-main>
       <el-footer>
-        <div style="text-align: center;line-height: 60px;font-size: 14px;">Version: 1.0.11</div>
+        <div style="text-align: center;line-height: 60px;font-size: 14px;">Version: {{version}}</div>
       </el-footer>
     </el-container>
 
@@ -119,6 +119,7 @@
       el: '#app',
       data: { 
         log:'',
+        version:'1.0.0',
         upBytes:' 0KB',
         downBytes:'0KB',
         options:[],
@@ -169,6 +170,12 @@
         connectStatus:'Disconneted'
       },
       mounted:function(){
+
+        window.GetVersion({}).then(function(resp){
+          console.log(resp)
+          App.version = resp.Version
+        })
+
         this.loadAllServers(function(){
           if(App.accessServerID == '' && App.servers.length > 0){
             App.accessServerID = App.servers[0].ID

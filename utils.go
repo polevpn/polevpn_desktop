@@ -3,11 +3,10 @@ package main
 import (
 	_ "embed"
 	"errors"
+	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
-	"strconv"
-	"strings"
 	"time"
 
 	core "github.com/polevpn/polevpn_core"
@@ -15,6 +14,9 @@ import (
 
 //go:embed resource/polevpn.ico
 var iconByte []byte
+
+//go:embed version
+var VERSION string
 
 func fileExist(path string) bool {
 	_, err := os.Stat(path)
@@ -26,35 +28,13 @@ func fileExist(path string) bool {
 
 func CheckServiceExist() bool {
 
-	if runtime.GOOS == "windows" {
+	_, err := http.Get("http://127.0.0.1:35973/check?version=" + VERSION)
 
-		_, err := core.ExecuteCommand("powershell", "get-process", `"polevpn_service"`)
-
-		if err != nil {
-			glog.Error("check servie fail,", err)
-			return false
-		} else {
-			return true
-		}
-
-	} else {
-
-		out, err := core.ExecuteCommand("bash", "-c", "pgrep -f \"polevpn_service\"|wc -l")
-
-		if err != nil {
-			glog.Error("check servie fail,", err)
-			return false
-		}
-
-		exist, err := strconv.Atoi(strings.Trim(string(out), " \r\n"))
-
-		if err != nil {
-			glog.Error("atoi fail,", err)
-			return false
-		}
-		return exist > 0
+	if err != nil {
+		glog.Error("check service fail,", err)
+		return false
 	}
-
+	return true
 }
 
 func StartService(logPath string) error {
@@ -69,13 +49,13 @@ func StartService(logPath string) error {
 	if runtime.GOOS == "darwin" {
 		out, err := core.ExecuteCommand("bash", "-c", `/usr/bin/osascript -e "do shell script \"`+dir+`/service/polevpn_service -logPath=`+logPath+` >/dev/null 2>&1 &\" with prompt \"PoleVPN Request System Privileges\" with administrator privileges"`)
 		if err != nil {
-			glog.Error("check servie fail,", err.Error()+","+string(out))
+			glog.Error("start service fail,", err.Error()+","+string(out))
 			return err
 		}
 	} else if runtime.GOOS == "linux" {
 		out, err := core.ExecuteCommand("bash", "-c", `sudo `+dir+`/service/polevpn_service -logPath=`+logPath+` >/dev/null 2>&1 &`)
 		if err != nil {
-			glog.Error("check servie fail,", err.Error()+","+string(out))
+			glog.Error("start service fail,", err.Error()+","+string(out))
 			return err
 		}
 	} else if runtime.GOOS == "windows" {
