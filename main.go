@@ -63,6 +63,7 @@ func main() {
 	mainView = webview.New(300, 570, true, true)
 	defer mainView.Destroy()
 	mainView.SetSize(300, 570, webview.HintFixed)
+	mainView.SetIcon(iconByte)
 
 	mainView.Navigate("http://127.0.0.1:35972/static/index.html")
 
