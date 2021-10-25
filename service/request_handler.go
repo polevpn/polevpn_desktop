@@ -35,6 +35,8 @@ func NewRequestHandler() *RequestHandler {
 
 func (rh *RequestHandler) OnClientEvent(event int, client *core.PoleVpnClient, av *anyvalue.AnyValue) {
 
+	defer core.PanicHandler()
+
 	switch event {
 	case core.CLIENT_EVENT_ADDRESS_ALLOCED:
 		{
@@ -120,6 +122,8 @@ func (rh *RequestHandler) onCallback(av *anyvalue.AnyValue) {
 }
 
 func (rh *RequestHandler) OnRequest(pkt []byte, conn Conn) {
+
+	defer core.PanicHandler()
 
 	req, err := anyvalue.NewFromJson(pkt)
 
