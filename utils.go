@@ -47,13 +47,13 @@ func StartService(logPath string) error {
 	}
 
 	if runtime.GOOS == "darwin" {
-		out, err := core.ExecuteCommand("bash", "-c", `/usr/bin/osascript -e "do shell script \"`+dir+`/service/polevpn_service -logPath=`+logPath+` >/dev/null 2>&1 &\" with prompt \"PoleVPN Request System Privileges\" with administrator privileges"`)
+		out, err := core.ExecuteCommand("bash", "-c", `/usr/bin/osascript -e "do shell script \"`+dir+`/service/polevpn_service -logPath=`+logPath+` >`+logPath+`/run.log 2>&1 &\" with prompt \"PoleVPN Request System Privileges\" with administrator privileges"`)
 		if err != nil {
 			glog.Error("start service fail,", err.Error()+","+string(out))
 			return err
 		}
 	} else if runtime.GOOS == "linux" {
-		out, err := core.ExecuteCommand("bash", "-c", `sudo `+dir+`/service/polevpn_service -logPath=`+logPath+` >/dev/null 2>&1 &`)
+		out, err := core.ExecuteCommand("bash", "-c", `sudo `+dir+`/service/polevpn_service -logPath=`+logPath+` >`+logPath+`/run.log 2>&1 &`)
 		if err != nil {
 			glog.Error("start service fail,", err.Error()+","+string(out))
 			return err
