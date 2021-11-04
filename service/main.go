@@ -13,15 +13,17 @@ var glog *elog.EasyLogger
 var handler *RequestHandler
 
 func signalHandler() {
+	signal.Ignore(syscall.SIGHUP)
+	signal.Ignore(syscall.SIGTERM)
 	c := make(chan os.Signal)
-	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
+	signal.Notify(c, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		for s := range c {
 			switch s {
-			case syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
-				glog.Info("receive exit signal,exit")
+			case syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT:
+				glog.Infof("receive exit signal %v,exit", s)
 				handler.stop()
-				os.Exit(0)
+				glog.Fatal("exit")
 			default:
 			}
 		}
