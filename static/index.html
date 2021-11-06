@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8">
   <link rel="stylesheet" href="./element-ui/lib/theme-chalk/index.css"/>
-  <script src="shortcut.js"></script>
 </head>
 <body style="overflow: hidden;" oncontextmenu="return false;" >
   <div id="app">
@@ -98,6 +97,9 @@
           <el-form-item label="Local Route Rules (option)" prop="LocalRouteRules">
             <el-input v-model="form.LocalRouteRules" rows="4" type="textarea" placeholder="10.8.0.0/8,172.31.0.0/16"></el-input>
           </el-form-item>
+          <el-form-item label="ProxyDomains (option)" prop="ProxyDomains">
+            <el-input v-model="form.ProxyDomains" rows="4" type="textarea" placeholder="www.google.com,youtube.com"></el-input>
+          </el-form-item>
           <el-form-item>
             <el-button type="primary" plain @click="onSubmit">Save</el-button>
             <el-button type="primary" plain @click="onDeleteClick" v-show="showDelete" >Delete</el-button>
@@ -145,6 +147,7 @@
           SkipVerifySSL: true,
           UseRemoteRouteRules: true,
           LocalRouteRules: '',
+          ProxyDomains:''
         },
         rules: {
           Name: [
@@ -268,6 +271,7 @@
             SkipVerifySSL: true,
             UseRemoteRouteRules: true,
             LocalRouteRules: '',
+            ProxyDomains: '',
           }
         },
         onAddClick: function(){

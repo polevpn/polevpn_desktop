@@ -56,6 +56,11 @@ func (rh *RequestHandler) OnClientEvent(event int, client *core.PoleVpnClient, a
 				routes = append(routes, strings.Split(rh.server.Get("LocalRouteRules").AsStr(), ",")...)
 			}
 
+			if rh.server.Get("ProxyDomains").AsStr() != "" {
+				ips := GetRouteIpsFromDomain(strings.Split(rh.server.Get("ProxyDomains").AsStr(), ","))
+				routes = append(routes, ips...)
+			}
+
 			glog.Info("route=", routes, ",allocated ip=", av.Get("ip").AsStr(), ",dns=", av.Get("dns").AsStr())
 
 			if runtime.GOOS == "windows" {

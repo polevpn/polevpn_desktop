@@ -17,6 +17,7 @@ type AccessServer struct {
 	SkipVerifySSL       bool
 	UseRemoteRouteRules bool
 	LocalRouteRules     string
+	ProxyDomains        string
 }
 
 type Logs struct {
@@ -73,6 +74,7 @@ func UpdateAccessServer(server AccessServer) error {
 		"UseRemoteRouteRules": server.UseRemoteRouteRules,
 		"SkipVerifySSL":       server.SkipVerifySSL,
 		"LocalRouteRules":     server.LocalRouteRules,
+		"ProxyDomains":        server.ProxyDomains,
 	})
 
 	if ret.Error != nil {
