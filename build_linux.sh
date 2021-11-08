@@ -9,4 +9,4 @@ go mod tidy
 go build  -ldflags="-s -w"
 cp -f polevpn_service ../build/linux/PoleVPN/service
 cd ../build/linux/
-zip -r PoleVPN.zip build/linux/* 
+zip -r PoleVPN.zip ./* 
