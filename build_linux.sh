@@ -1,3 +1,4 @@
+go clean
 go build  -ldflags="-s -w"
 mkdir -p build/linux/PoleVPN
 mkdir -p build/linux/PoleVPN/service
