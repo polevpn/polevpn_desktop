@@ -1,6 +1,28 @@
-<key>NSHighResolutionCapable</key>
-<string>True</string>
-<key>LSUIElement</key>
-<string>1</string>
-<key>NSPrincipalClass</key>
-<string>NSApplication</string>
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist SYSTEM "file://localhost/System/Library/DTDs/PropertyList.dtd">
+<plist version="0.9">
+<dict>
+    <key>CFBundlePackageType</key>
+    <string>APPL</string>
+    <key>NSHumanReadableCopyright</key>
+    <string>1.0.4, Copyright © 2021 The PoleVPN</string>
+    <key>CFBundleShortVersionString</key>
+    <string>1.0.4</string>
+    <key>CFBundleVersion</key>
+    <string>1.0.4</string>
+    <key>CFBundleExecutable</key>
+    <string>PoleVPN</string>
+    <key>CFBundleName</key>
+    <string>PoleVPN</string>
+    <key>CFBundleIdentifier</key>
+    <string>com.polevpn.desktop</string>
+    <key>NSHighResolutionCapable</key>
+    <string>True</string>
+    <key>LSUIElement</key>
+    <string>1</string>
+    <key>NSPrincipalClass</key>
+    <string>NSApplication</string>
+    <key>CFBundleIconFile</key>
+    <string>polevpn.icns</string>
+</dict>
+</plist>
