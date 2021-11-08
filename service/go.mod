@@ -6,7 +6,6 @@ require (
 	github.com/gorilla/websocket v1.4.2 // indirect
 	github.com/polevpn/anyvalue v1.0.6 // indirect
 	github.com/polevpn/elog v1.1.1 // indirect
-	github.com/polevpn/polevpn_core v1.0.13 // indirect
+	github.com/polevpn/polevpn_core v1.1.3
 )
 
-replace github.com/polevpn/polevpn_core => ../../polevpn_core
