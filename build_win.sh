@@ -1,6 +1,6 @@
 ./makerc.sh
 go mod tidy
-go build  -ldflags="-s -w -H windowsgui"
+go build  -ldflags="-s -w -H windowsgui -extldflags -static"
 rm polevpn.syso
 mkdir -p build/win/PoleVPN
 mkdir -p build/win/PoleVPN/service
