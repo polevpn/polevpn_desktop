@@ -11,5 +11,6 @@ cd service
 go mod tidy
 go build  -ldflags="-s -w"
 cp polevpn_service.exe ../build/win/PoleVPN/service
-cd ../
+cd ../build/win
+zip -r PoleVPN.zip ./* 
 rm polevpn.syso

@@ -36,3 +36,18 @@ jobs:
         with:
           name: PoleVPN-macos.zip
           path: build/macos/PoleVPN.zip
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.16.x
+      - name: Build Windows
+        run: bash ./build_win.sh
+      - name: Upload Zip
+        uses: actions/upload-artifact@v1
+        with:
+          name: PoleVPN-win.zip
+          path: build/win/PoleVPN.zip
