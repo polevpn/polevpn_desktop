@@ -36,13 +36,17 @@ func main() {
 
 	glog.SetLogPath(homeDir + string(os.PathSeparator) + ".polevpn")
 
+	glog.Info("check service")
 	exist := CheckServiceExist()
 
 	if !exist {
+		glog.Info("starting service")
 		err := StartService(homeDir + string(os.PathSeparator) + ".polevpn")
 		if err != nil {
 			glog.Fatal("start service fail,", err)
 		}
+		glog.Info("start service ok")
+
 	}
 
 	http.Handle("/", http.FileServer(http.FS(staticFiles)))
@@ -54,35 +58,46 @@ func main() {
 		}
 	}()
 
+	glog.Info("init db")
+
 	err = InitDB(homeDir + "/.polevpn/config.db")
 
 	if err != nil {
 		glog.Fatal("init db fail,", err)
 	}
 
+	glog.Info("init db ok")
+
 	mainView = webview.New(300, 570, true, true)
 	defer mainView.Destroy()
 	mainView.SetSize(300, 570, webview.HintFixed)
 	mainView.SetIcon(iconByte)
 
+	glog.Info("show homepage")
+
 	mainView.Navigate("http://127.0.0.1:35972/static/index.html")
 
+	glog.Info("init controller")
 	controller, err := NewController(mainView)
 
 	if err != nil {
 		glog.Fatal("new controller fail,", err)
 	}
 
+	glog.Info("init controller ok")
+
 	controller.Bind()
 
 	signalHandler()
-
+	glog.Info("register systray")
 	systray.Register(onReady, func() {
 		mainView.Terminate()
 		controller.StopAccessServer(ReqStopAccessServer{})
 		glog.Info("exit")
+		glog.Flush()
 	})
 
+	glog.Info("app running")
 	mainView.Run()
 }
 

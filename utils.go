@@ -63,7 +63,7 @@ func StartService(logPath string) error {
 		go func() {
 			out, err := core.ExecuteCommand(dir+`\service\polevpn_service.exe`, `-logPath=`+logPath)
 			if err != nil {
-				glog.Error("check servie fail,", err.Error()+","+string(out))
+				glog.Error("start servie fail,", err.Error()+","+string(out))
 			}
 		}()
 	}
