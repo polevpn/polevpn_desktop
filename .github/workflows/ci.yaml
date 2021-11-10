@@ -17,7 +17,7 @@ jobs:
       - name: Upload Zip
         uses: actions/upload-artifact@v1
         with:
-          name: PoleVPN-linux.zip
+          name: PoleVPN-linux
           path: build/linux/PoleVPN.zip
 
 
@@ -34,7 +34,7 @@ jobs:
       - name: Upload Zip
         uses: actions/upload-artifact@v1
         with:
-          name: PoleVPN-macos.zip
+          name: PoleVPN-macos
           path: build/macos/PoleVPN.zip
   build-windows:
     runs-on: windows-latest
@@ -49,5 +49,5 @@ jobs:
       - name: Upload Zip
         uses: actions/upload-artifact@v1
         with:
-          name: PoleVPN-win.zip
-          path: build/win/PoleVPN.zip
+          name: PoleVPN-win
+          path: build/win/PoleVPN.tgz
