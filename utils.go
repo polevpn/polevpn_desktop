@@ -47,23 +47,23 @@ func StartService(logPath string) error {
 	}
 
 	if runtime.GOOS == "darwin" {
-		out, err := core.ExecuteCommand("bash", "-c", `/usr/bin/osascript -e "do shell script \"`+dir+`/service/polevpn_service -logPath=`+logPath+` >`+logPath+`/run.log 2>&1 &\" with prompt \"PoleVPN Request System Privileges\" with administrator privileges"`)
+		err := core.RunCommand("bash", "-c", `/usr/bin/osascript -e "do shell script \"`+dir+`/service/polevpn_service -logPath=`+logPath+` >`+logPath+`/run.log 2>&1 &\" with prompt \"PoleVPN Request System Privileges\" with administrator privileges"`)
 		if err != nil {
-			glog.Error("start service fail,", err.Error()+","+string(out))
+			glog.Error("start service fail,", err.Error())
 			return err
 		}
 	} else if runtime.GOOS == "linux" {
-		out, err := core.ExecuteCommand("bash", "-c", `pkexec `+dir+`/service/polevpn_service -logPath=`+logPath+` >`+logPath+`/run.log 2>&1 &`)
+		err := core.RunCommand("pkexec", "bash", "-c", dir+`/service/polevpn_service -logPath=`+logPath+` >`+logPath+`/run.log 2>&1 &`)
 		if err != nil {
-			glog.Error("start service fail,", err.Error()+","+string(out))
+			glog.Error("start service fail,", err.Error())
 			return err
 		}
 	} else if runtime.GOOS == "windows" {
 
 		go func() {
-			out, err := core.ExecuteCommand(dir+`\service\polevpn_service.exe`, `-logPath=`+logPath)
+			err := core.RunCommand(dir+`\service\polevpn_service.exe`, `-logPath=`+logPath)
 			if err != nil {
-				glog.Error("start servie fail,", err.Error()+","+string(out))
+				glog.Error("start servie fail,", err.Error())
 			}
 		}()
 	}
