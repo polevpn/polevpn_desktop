@@ -53,7 +53,7 @@ func StartService(logPath string) error {
 			return err
 		}
 	} else if runtime.GOOS == "linux" {
-		out, err := core.ExecuteCommand("bash", "-c", `sudo `+dir+`/service/polevpn_service -logPath=`+logPath+` >`+logPath+`/run.log 2>&1 &`)
+		out, err := core.ExecuteCommand("bash", "-c", `pkexec `+dir+`/service/polevpn_service -logPath=`+logPath+` >`+logPath+`/run.log 2>&1 &`)
 		if err != nil {
 			glog.Error("start service fail,", err.Error()+","+string(out))
 			return err
