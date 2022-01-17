@@ -35,7 +35,7 @@ func GetRouteIpsFromDomain(domains []string) []string {
 		}
 		for _, netip := range netips {
 			if !strings.Contains(netip.String(), ":") {
-				ips = append(ips, netip.String())
+				ips = append(ips, netip.String()+"/32")
 			}
 		}
 	}
