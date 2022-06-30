@@ -73,10 +73,6 @@ func main() {
 	mainView.SetSize(300, 570, webview.HintFixed)
 	mainView.SetIcon(iconByte)
 
-	glog.Info("show homepage")
-
-	mainView.Navigate("http://127.0.0.1:35972/static/index.html")
-
 	glog.Info("init controller")
 	controller, err := NewController(mainView)
 
@@ -87,6 +83,9 @@ func main() {
 	glog.Info("init controller ok")
 
 	controller.Bind()
+
+	glog.Info("show homepage")
+	mainView.Navigate("http://127.0.0.1:35972/static/index.html")
 
 	signalHandler()
 	glog.Info("register systray")
