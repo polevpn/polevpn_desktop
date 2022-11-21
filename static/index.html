@@ -124,9 +124,9 @@
     const { createStore } = Vuex
     const { useStore } = Vuex
     const { ref } = Vue
-
     const { ElMessage } = ElementPlus;
 
+    //data for form
     var formData = {
       ID:null,
       Name:'',
@@ -139,7 +139,7 @@
       LocalRouteRules: '',
       ProxyDomains:''
     }
-
+    //rules for form verification
     var formRules = {
       Name: [
         { required: true, message: 'Name can not be empty', trigger: 'blur' },
@@ -158,7 +158,7 @@
       ]
     }
 
-
+    //state store for app
    const store = createStore({
     state(){
       return {
@@ -191,13 +191,14 @@
     }
     })
     
-
+    //composition api for app
     const App = {
       setup(){
         
         const form = ref()
         const rdrawer = ref()
 
+        //-------------------loadAllServers----------------------
         function loadAllServers(callback){
           window.GetAllAccessServer({}).then(function(resp){
             if(resp.Code != 0){
@@ -216,7 +217,7 @@
             }
           })
         }
-
+        //-------------------onMounted----------------------
         onMounted(() => {
           console.log("onMounted")
 
@@ -235,11 +236,12 @@
           },5000)
         })
 
+        //-------------------onShowLogs----------------------
         function onShowLogs(){
           window.GetAllLogs({}).then(function(resp){})
           store.state.showLogDrawer=true
         }
-
+        //-------------------onConnectClick----------------------
         function onConnectClick(){
 
           store.state.connectDisable = true
@@ -274,7 +276,7 @@
             })
           }
         }
-
+        //-------------------onEditClick----------------------
         function onEditClick(ID){
           store.state.formTitle = "Edit Access Server"
 
@@ -291,7 +293,7 @@
           store.state.showDelete = true
           store.state.showRightDrawer = true
         }
-
+        //-------------------resetForm----------------------
         function resetForm(){
           store.state.form = {
             ID:null,
@@ -307,13 +309,14 @@
           }
         }
 
+        //-------------------onAddClick----------------------
         function onAddClick(){
           store.state.formTitle = "Add Access Server"
           resetForm()
           store.state.showDelete = false
           store.state.showRightDrawer = true
         }
-
+        //-------------------onDeleteClick----------------------
         function onDeleteClick(){
           window.DeleteAccessServer({ID:store.state.form.ID}).then(function(resp){
             console.log(resp)
@@ -327,7 +330,7 @@
           }
           rdrawer.value.handleClose()
         }
-        
+        //-------------------onSubmit----------------------
         function onSubmit(){
           form.value.validate(function(valid){
           if (valid) {
@@ -357,11 +360,11 @@
             }
           });
         }
-
+        //-------------------onReset----------------------
         function onReset(){
           form.value.resetFields()
         }
-
+        //-------------------onRightDrawerClose----------------------
         function onRightDrawerClose(done){
           resetForm()
           done()
@@ -381,67 +384,11 @@
           onReset,
           onRightDrawerClose
         }
-
-      },
-      onCallback(msg){
-          if(msg.event == 'started'){
-            ElMessage({message: "Access server connected",type: 'success',customClass:'alert'});
-            store.state.connectIcon = 'SuccessFilled'
-            store.state.connectDisable = false
-            store.state.connectStatus = 'Allocating IP Address...'
-            store.state.connectTips = 'Disconnect From Access Server'
-
-          }else if(msg.event == 'stoped'){
-            ElMessage({message: "Access server disconnected",type: 'success',customClass:'alert'});
-            store.state.localIp = ''
-            store.state.remoteIp = ''
-            store.state.connectIcon = 'Promotion'
-            store.state.connectDisable = false
-            store.state.connectStatus = 'Disconnected'
-            store.state.connectTips = 'Connect To Access Server'
-
-          }else if(msg.event == "allocated"){
-
-            store.state.connectStatus = ''
-            store.state.localIp = 'LocalIP: ' +msg.data.ip
-            store.state.remoteIp = 'RemoteIP: ' +msg.data.remoteIp
-
-          }else if (msg.event == "error"){
-            ElMessage({message: "vpn error,"+msg.data.error,type: 'warning',customClass:'alert'});
-          }else if (msg.event == "reconnecting"){
-            ElMessage({message: "Network disconnected,reconnecting",type: 'warning',customClass:'alert'});
-          }else if (msg.event == "reconnected"){
-            ElMessage({message: "Network reconnected",type: 'warning',customClass:'alert'});
-          }else if (msg.event == "error"){
-            ElMessage({message: "vpn error,"+msg.data.error,type: 'warning',customClass:'alert'});
-          }else if (msg.event == "bytes"){
-            if (msg.data.UpBytes < 1024){
-              store.state.upBytes = "0KB"
-            }else if (msg.data.UpBytes >= 1024 && msg.data.UpBytes < 1024*1024) {
-              store.state.upBytes = (msg.data.UpBytes/1024).toFixed(2) +"KB"
-            }else if (msg.data.UpBytes >= 1024*1024 && msg.data.UpBytes < 1024*1024*1024){
-              store.state.upBytes = (msg.data.UpBytes/1024/1024).toFixed(2) +"MB"
-            }else {
-              store.state.upBytes = (msg.data.UpBytes/1024/1024/1024).toFixed(2) +"GB"
-            }
-
-            if (msg.data.DownBytes < 1024){
-              store.state.downBytes = "0KB"
-            }else if (msg.data.DownBytes >= 1024 && msg.data.DownBytes < 1024*1024) {
-              store.state.downBytes = (msg.data.DownBytes/1024).toFixed(2) +"KB"
-            }else if (msg.data.DownBytes >= 1024*1024 && msg.data.DownBytes < 1024*1024*1024){
-              store.state.downBytes = (msg.data.DownBytes/1024/1024).toFixed(2) +"MB"
-            }else {
-              store.state.downBytes = (msg.data.DownBytes/1024/1024/1024).toFixed(2) +"GB"
-            }
-          } else if (msg.event == "logs") {              
-              store.state.log = msg.data.logs
-          }else{
-            console.log(msg)
-          }
-        }
+      }
     }
     
+
+    //app entry
     const app = createApp(App)
     app.use(store)
     for ([name, comp] of Object.entries(ElementPlusIconsVue)) {
@@ -452,6 +399,65 @@
     })
 
     app.mount('#app')
+
+    //callback for golang
+    window.onCallback = function(msg){
+      if(msg.event == 'started'){
+        ElMessage({message: "Access server connected",type: 'success',customClass:'alert'});
+        store.state.connectIcon = 'SuccessFilled'
+        store.state.connectDisable = false
+        store.state.connectStatus = 'Allocating IP Address...'
+        store.state.connectTips = 'Disconnect From Access Server'
+
+      }else if(msg.event == 'stoped'){
+        ElMessage({message: "Access server disconnected",type: 'success',customClass:'alert'});
+        store.state.localIp = ''
+        store.state.remoteIp = ''
+        store.state.connectIcon = 'Promotion'
+        store.state.connectDisable = false
+        store.state.connectStatus = 'Disconnected'
+        store.state.connectTips = 'Connect To Access Server'
+
+      }else if(msg.event == "allocated"){
+
+        store.state.connectStatus = ''
+        store.state.localIp = 'LocalIP: ' +msg.data.ip
+        store.state.remoteIp = 'RemoteIP: ' +msg.data.remoteIp
+
+      }else if (msg.event == "error"){
+        ElMessage({message: "vpn error,"+msg.data.error,type: 'warning',customClass:'alert'});
+      }else if (msg.event == "reconnecting"){
+        ElMessage({message: "Network disconnected,reconnecting",type: 'warning',customClass:'alert'});
+      }else if (msg.event == "reconnected"){
+        ElMessage({message: "Network reconnected",type: 'warning',customClass:'alert'});
+      }else if (msg.event == "error"){
+        ElMessage({message: "vpn error,"+msg.data.error,type: 'warning',customClass:'alert'});
+      }else if (msg.event == "bytes"){
+        if (msg.data.UpBytes < 1024){
+          store.state.upBytes = "0KB"
+        }else if (msg.data.UpBytes >= 1024 && msg.data.UpBytes < 1024*1024) {
+          store.state.upBytes = (msg.data.UpBytes/1024).toFixed(2) +"KB"
+        }else if (msg.data.UpBytes >= 1024*1024 && msg.data.UpBytes < 1024*1024*1024){
+          store.state.upBytes = (msg.data.UpBytes/1024/1024).toFixed(2) +"MB"
+        }else {
+          store.state.upBytes = (msg.data.UpBytes/1024/1024/1024).toFixed(2) +"GB"
+        }
+
+        if (msg.data.DownBytes < 1024){
+          store.state.downBytes = "0KB"
+        }else if (msg.data.DownBytes >= 1024 && msg.data.DownBytes < 1024*1024) {
+          store.state.downBytes = (msg.data.DownBytes/1024).toFixed(2) +"KB"
+        }else if (msg.data.DownBytes >= 1024*1024 && msg.data.DownBytes < 1024*1024*1024){
+          store.state.downBytes = (msg.data.DownBytes/1024/1024).toFixed(2) +"MB"
+        }else {
+          store.state.downBytes = (msg.data.DownBytes/1024/1024/1024).toFixed(2) +"GB"
+        }
+      } else if (msg.event == "logs") {              
+          store.state.log = msg.data.logs
+      }else{
+        console.log(msg)
+      }
+    }
 
   </script>
   <style>

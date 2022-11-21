@@ -39,7 +39,7 @@ func (c *Controller) Bind() {
 func (c *Controller) EventCallback(av *anyvalue.AnyValue) {
 
 	json, _ := av.EncodeJson()
-	c.view.Dispatch(func() { c.view.Eval("App.onCallback(" + string(json) + ")") })
+	c.view.Dispatch(func() { c.view.Eval("window.onCallback(" + string(json) + ")") })
 }
 
 func (c *Controller) ConnectAccessServer(req ReqConnectAccessServer) *RespConnectAccessServer {
