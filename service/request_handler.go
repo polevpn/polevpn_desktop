@@ -53,11 +53,11 @@ func (rh *RequestHandler) OnClientEvent(event int, client *core.PoleVpnClient, a
 			}
 
 			if rh.server.Get("LocalRouteRules").AsStr() != "" {
-				routes = append(routes, strings.Split(rh.server.Get("LocalRouteRules").AsStr(), ",")...)
+				routes = append(routes, strings.Split(rh.server.Get("LocalRouteRules").AsStr(), "\n")...)
 			}
 
 			if rh.server.Get("ProxyDomains").AsStr() != "" {
-				ips := GetRouteIpsFromDomain(strings.Split(rh.server.Get("ProxyDomains").AsStr(), ","))
+				ips := GetRouteIpsFromDomain(strings.Split(rh.server.Get("ProxyDomains").AsStr(), "\n"))
 				routes = append(routes, ips...)
 			}
 
