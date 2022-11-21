@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="./element-ui/index.css"/>
 </head>
 <body style="overflow: hidden;" oncontextmenu="return true;" >
-  <div id="app">
+  <div id="app" style="display:none;">
     <el-container direction="vertical">
       <el-header>
         <span class="header-text">PoleVPN</span>
@@ -221,6 +221,8 @@
         onMounted(() => {
           console.log("onMounted")
 
+          document.getElementById("app").style.display = 'block'
+          
           window.GetVersion({}).then(function(resp){
             store.state.version = resp.Version
           })
