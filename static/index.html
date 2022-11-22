@@ -432,8 +432,6 @@
         ElMessage({message: "Network disconnected,reconnecting",type: 'warning',customClass:'alert'});
       }else if (msg.event == "reconnected"){
         ElMessage({message: "Network reconnected",type: 'warning',customClass:'alert'});
-      }else if (msg.event == "error"){
-        ElMessage({message: "vpn error,"+msg.data.error,type: 'warning',customClass:'alert'});
       }else if (msg.event == "bytes"){
         if (msg.data.UpBytes < 1024){
           store.state.upBytes = "0KB"
