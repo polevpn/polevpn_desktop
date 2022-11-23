@@ -5,36 +5,49 @@
   <link rel="stylesheet" href="./element-ui/index.css"/>
 </head>
 <body style="overflow: hidden;" oncontextmenu="return true;" >
-  <div id="app" style="display:none;">
-    <el-container direction="vertical">
-      <el-header>
-        <span class="header-text">PoleVPN</span>
-        <el-icon class="el-icon-s-unfold" @click="this.$store.state.showLeftDrawer = true"><Expand /></el-icon>
-        <el-icon class="el-icon-plus" title="Add Access Server" @click="onAddClick"><Plus /></el-icon>
-      </el-header>
-      <el-main>
-        <el-select v-model="this.$store.state.accessServerID" style="margin-top:30px;" placeholder="Select Access Server">
+<div id="app" style="display:none;">
+  <el-container direction="vertical">
+    <el-header>
+      <span class="header-text">PoleVPN</span>
+      <el-icon class="el-icon-s-unfold" @click="this.$store.state.showLeftDrawer = true"><Expand /></el-icon>
+      <el-icon class="el-icon-plus" title="Add Access Server" @click="onAddClick"><Plus /></el-icon>
+    </el-header>
+    <el-main>
+
+      <el-row justify="center" style="margin-top:30px;">
+        <el-select size="large" v-model="this.$store.state.accessServerID" placeholder="Select Access Server">
           <el-option style="padding-right: 20px;" v-for="item in this.$store.state.options" :key="item.value" :label="item.label" :value="item.value">
             <span style="float: left">{{ item.label }}</span>
-            <span style="float: right;font-size: 16px;">           
-              <el-icon title="Edit"  @click="onEditClick(item.value)"><Edit/></el-icon>
-            </span>
+            <span style="float: right;font-size: 16px;">
+                <el-icon title="Edit"  @click="onEditClick(item.value)"><Edit/></el-icon>
+              </span>
           </el-option>
         </el-select>
-        <el-tooltip class="item" effect="light" :content="this.$store.state.connectTips" :hide-after="1000" placement="top">
-        <el-button class="el-button-connect" :icon="this.$store.state.connectIcon" @click="onConnectClick" :disabled="this.$store.state.connectDisable" circle></el-button>
-        </el-tooltip>
-        <div style="margin-top: 40px;line-height: 30px;">{{this.$store.state.remoteIp}}</div>
-        <div style="line-height: 30px;">{{this.$store.state.localIp}}</div>
-        <div style="line-height: 30px;">{{this.$store.state.connectStatus}}</div>
-      </el-main>
-      <el-footer>
-        <span class="footer-upload">Upload: {{this.$store.state.upBytes}}  <el-icon><Top/></el-icon></span>
-        <span class="footer-download">Download: {{this.$store.state.downBytes}}  <el-icon><Bottom/></el-icon></span>
-      </el-footer>
-    </el-container>
+      </el-row>
 
-    <el-drawer size="70%"  custom-class="menu" title="PoleVPN" v-model="this.$store.state.showLeftDrawer" :direction="this.$store.state.leftDirection">
+      <el-row justify="center" style="margin-top:80px;">
+        <el-tooltip class="item" effect="light" :content="this.$store.state.connectTips" :hide-after="100" placement="top">
+          <el-button class="el-button-connect" :icon="this.$store.state.connectIcon" @click="onConnectClick" :disabled="this.$store.state.connectDisable" circle></el-button>
+        </el-tooltip>
+      </el-row>
+
+      <el-row justify="center" style="margin-top: 40px;">
+        <div style="line-height: 30px;">{{this.$store.state.remoteIp}}</div>
+      </el-row>
+      <el-row justify="center">
+        <div style="line-height: 30px;">{{this.$store.state.localIp}}</div>
+      </el-row>
+      <el-row justify="center">
+        <div style="line-height: 30px;">{{this.$store.state.connectStatus}}</div>
+      </el-row>
+    </el-main>
+    <el-footer>
+      <span class="footer-upload">Upload: {{this.$store.state.upBytes}}  <el-icon><Top/></el-icon></span>
+      <span class="footer-download">Download: {{this.$store.state.downBytes}}  <el-icon><Bottom/></el-icon></span>
+    </el-footer>
+  </el-container>
+
+  <el-drawer size="70%"  custom-class="menu" title="PoleVPN" v-model="this.$store.state.showLeftDrawer" :direction="this.$store.state.leftDirection">
     <el-container>
       <el-main>
         <div style="font-size: 14px;background-color: #fff; line-height: 60px;">Fast Security Reliable</div>
@@ -48,76 +61,108 @@
           <div onmouseover="this.style.backgroundColor='white'" onmouseout="this.style.backgroundColor='#eee'" @click="this.$store.state.showHelpDrawer=true"  class="setting-menu">
             <i class="el-icon-question"></i> Help
           </div>
-  
+
         </div>
       </el-main>
       <el-footer>
         <div style="text-align: center;line-height: 60px;font-size: 14px;">Version: {{this.$store.state.version}}</div>
       </el-footer>
     </el-container>
-
+    
     <el-drawer title="Logs" size="100%" :append-to-body="true"  v-model="this.$store.state.showLogDrawer">
       <textarea style="height: 99.3%;width: 100%;border-width: 0;background-color: #eee;">{{this.$store.state.log}}</textarea>
     </el-drawer>
 
     <el-drawer title="About" size="100%" :append-to-body="true" v-model="this.$store.state.showAboutDrawer">
-      <iframe src="about.html" frameborder=0  marginheight=0 marginwidth=0 style="width: 100%;height: 99.3%;"></iframe>
-    </el-drawer>
+      <div style="padding: 10px;font-size: 14px;">
+        <p>
+          <span style="font-weight: bold;">PoleVPN is a tool that helps enterprises to realize the following three functions with individual users:</span>
+        <ul>
+          <li>Help companies realize the point-to-point connection of two LANs in different regions</li>
+          <li>Help employees of the company to remotely access company resources</li>
+          <li>Protect users' online privacy through PoleVPN technology</li>
+        </ul>
 
-    <el-drawer title="Help" size="100%" :append-to-body="true" v-model="this.$store.state.showHelpDrawer">
-      <iframe src="help.html" frameborder=0  marginheight=0 marginwidth=0 style="width: 100%;height: 99.3%;"></iframe>
-    </el-drawer>
-
-    </el-drawer>
-    
-    <el-drawer  ref="rdrawer" size="100%" :title="this.$store.state.formTitle" v-model="this.$store.state.showRightDrawer" :direction="this.$store.state.rightDirection" destroy-on-close :before-close="onRightDrawerClose" >
-      <div class="el-drawer-right">
-        <el-form ref="form" size="small" :model="this.$store.state.form" :rules="this.$store.state.rules" label-width="80px" label-position="top">
-          <el-form-item label="Name" prop="Name">
-            <el-input v-model="this.$store.state.form.Name" placeholder="server name"></el-input>
-          </el-form-item>
-          <el-form-item label="Endpoint" prop="Endpoint">
-            <el-input v-model="this.$store.state.form.Endpoint" placeholder="start with wss:// or h3s://"></el-input>
-          </el-form-item>
-          <el-form-item label="User" prop="User">
-            <el-input v-model="this.$store.state.form.User"></el-input>
-          </el-form-item>
-          <el-form-item label="Password" prop="Password">
-            <el-input v-model="this.$store.state.form.Password" minlength="6" maxlength="16" show-password></el-input>
-          </el-form-item>
-          <el-form-item label="Skip SSL Verify" prop="SkipVerifySSL">
-            <el-switch v-model="this.$store.state.form.SkipVerifySSL"></el-switch>
-          </el-form-item>
-          <el-form-item label="Use Remote Route Rules" prop="UseRemoteRouteRules">
-            <el-switch v-model="this.$store.state.form.UseRemoteRouteRules"></el-switch>
-          </el-form-item>
-          <el-form-item label="Sni (option)" prop="Sni">
-            <el-input v-model="this.$store.state.form.Sni"></el-input>
-          </el-form-item>
-          <el-form-item label="Local Route Rules (option)" prop="LocalRouteRules">
-            <el-input v-model="this.$store.state.form.LocalRouteRules" rows="6" wrap="off" type="textarea" placeholder="10.8.0.0/8(one item per line)"></el-input>
-          </el-form-item>
-          <el-form-item label="ProxyDomains (option)" prop="ProxyDomains">
-            <el-input v-model="this.$store.state.form.ProxyDomains" rows="6" wrap="off" type="textarea" placeholder="www.google.com(one item per line)"></el-input>
-          </el-form-item>
-          <el-form-item>
-            <el-button type="primary" plain @click="onSubmit">Save</el-button>
-            <el-button type="primary" plain @click="onDeleteClick" v-show="this.$store.state.showDelete" >Delete</el-button>
-            <el-button @click="onReset">Reset</el-button>
-
-          </el-form-item>
-        </el-form>
+        <span style="font-weight: bold;"> Why we are trustworthy:</span>
+        <ul>
+          <li>The entire data connection adopts TLS encryption technology to protect your data from being stolen and
+            tampered during transmission</li>
+          <li>Using packet loss detection technology, in an unstable network environment, network data transmission is
+            faster and lower delay</li>
+          <li>Easier to configure and install, simple and quick to use</li>
+        </ul>
+        </p>
       </div>
     </el-drawer>
 
-  </div>
+    <el-drawer title="Help" size="100%" :append-to-body="true" v-model="this.$store.state.showHelpDrawer">
+      <div style="padding: 10px;font-size: 14px;">
+        <span style="font-weight: bold;">What should I do when I can’t connect?</span>
+        <ul>
+          <li>Check if the network is normal</li>
+          <li>Check whether the filled Access Server information is correct</li>
+          <li>Ask the network administrator for assistance</li>
+          <li>Go to the PoleVPN website and report the problem</li>
+        </ul>
+        <span style="font-weight: bold;">Advantages of PoleVPN over OpenVPN</span>
+        <ul>
+          <li>Easy to install, configure and maintain</li>
+          <li>It can easily break through network blockades and firewalls</li>
+          <li>Completely free</li>
+        </ul>
+      </div>
+    </el-drawer>
+
+  </el-drawer>
+
+  <el-drawer  ref="rdrawer" size="100%" :title="this.$store.state.formTitle" v-model="this.$store.state.showRightDrawer" :direction="this.$store.state.rightDirection" destroy-on-close :before-close="onRightDrawerClose" >
+    <div class="el-drawer-right">
+      <el-form ref="form" size="small" :model="this.$store.state.form" :rules="this.$store.state.rules" label-width="80px" label-position="top">
+        <el-form-item label="Name" prop="Name">
+          <el-input v-model="this.$store.state.form.Name" placeholder="server name"></el-input>
+        </el-form-item>
+        <el-form-item label="Endpoint" prop="Endpoint">
+          <el-input v-model="this.$store.state.form.Endpoint" placeholder="start with wss:// or h3s://"></el-input>
+        </el-form-item>
+        <el-form-item label="User" prop="User">
+          <el-input v-model="this.$store.state.form.User"></el-input>
+        </el-form-item>
+        <el-form-item label="Password" prop="Password">
+          <el-input v-model="this.$store.state.form.Password" minlength="6" maxlength="16" show-password></el-input>
+        </el-form-item>
+        <el-form-item label="Skip SSL Verify" prop="SkipVerifySSL">
+          <el-switch v-model="this.$store.state.form.SkipVerifySSL"></el-switch>
+        </el-form-item>
+        <el-form-item label="Use Remote Route Rules" prop="UseRemoteRouteRules">
+          <el-switch v-model="this.$store.state.form.UseRemoteRouteRules"></el-switch>
+        </el-form-item>
+        <el-form-item label="Sni (option)" prop="Sni">
+          <el-input v-model="this.$store.state.form.Sni"></el-input>
+        </el-form-item>
+        <el-form-item label="Local Route Rules (option)" prop="LocalRouteRules">
+          <el-input v-model="this.$store.state.form.LocalRouteRules" rows="6" wrap="off" type="textarea" placeholder="10.8.0.0/8(one item per line)"></el-input>
+        </el-form-item>
+        <el-form-item label="ProxyDomains (option)" prop="ProxyDomains">
+          <el-input v-model="this.$store.state.form.ProxyDomains" rows="6" wrap="off" type="textarea" placeholder="www.google.com(one item per line)"></el-input>
+        </el-form-item>
+        <el-form-item>
+          <el-button type="primary" plain @click="onSubmit">Save</el-button>
+          <el-button type="primary" plain @click="onDeleteClick" v-show="this.$store.state.showDelete" >Delete</el-button>
+          <el-button @click="onReset">Reset</el-button>
+
+        </el-form-item>
+      </el-form>
+    </div>
+  </el-drawer>
+
+</div>
 </body>
-  <script src="./vue.js"></script>
-  <script src="./element-ui/index.js"></script>
-  <script src="./element-ui/locale/en.js"></script>
-  <script src="./element-ui/icon.js"></script>
-  <script src="./element-ui/vuex.js"></script>
-  <script>
+<script src="./vue.js"></script>
+<script src="./element-ui/index.js"></script>
+<script src="./element-ui/locale/en.js"></script>
+<script src="./element-ui/icon.js"></script>
+<script src="./element-ui/vuex.js"></script>
+<script>
     const { createApp } = Vue
     const { reactive } = Vue
     const { onMounted } = Vue
@@ -150,11 +195,11 @@
       ],
       User: [
         { required: true, message: 'User can not be empty', trigger: 'blur' },
-        { min: 3, max: 32, message: 'length must to be 3 to 32', trigger: 'blur' }          
+        { min: 3, max: 32, message: 'length must to be 3 to 32', trigger: 'blur' }
       ],
       Password: [
         { required: true, message: 'Password can not be empty', trigger: 'blur' },
-        { min: 6, max: 16, message: 'length must to be 6 to 16', trigger: 'blur' }          
+        { min: 6, max: 16, message: 'length must to be 6 to 16', trigger: 'blur' }
       ]
     }
 
@@ -190,11 +235,11 @@
       }
     }
     })
-    
+
     //composition api for app
     const App = {
       setup(){
-        
+
         const form = ref()
         const rdrawer = ref()
 
@@ -226,14 +271,12 @@
           window.GetVersion({}).then(function(resp){
             store.state.version = resp.Version
           })
-
           loadAllServers(function(){
             if(store.state.accessServerID == '' && store.state.servers.length > 0){
-              store.state.accessServerID = store.state.servers[0].ID
-            }
+             store.state.accessServerID = store.state.servers[0].ID            }
           })
 
-          setInterval(function(){
+         setInterval(function(){
             window.GetUpDownBytes({}).then(function(resp){})
           },5000)
         })
@@ -388,7 +431,7 @@
         }
       }
     }
-    
+
 
     //app entry
     const app = createApp(App)
@@ -452,7 +495,7 @@
         }else {
           store.state.downBytes = (msg.data.DownBytes/1024/1024/1024).toFixed(2) +"GB"
         }
-      } else if (msg.event == "logs") {              
+      } else if (msg.event == "logs") {
           store.state.log = msg.data.logs
       }else{
         console.log(msg)
@@ -460,16 +503,15 @@
     }
 
   </script>
-  <style>
+<style>
     html,body,#app,.el-container,.el-drawer {
     height: 100%;
     margin: auto;
-    }      
+    }
     .alert {
     min-width: 90%;
     }
     .el-button-connect {
-    margin-top: 80px;
     height: 120px;
     width: 120px;
     font-size: 40px;
@@ -483,7 +525,7 @@
     line-height: 60px;
     padding: 0px 10px 0px 10px;
     background-color: #fff;
-    }  
+    }
 
     .el-header{
     font-size: 30px;
