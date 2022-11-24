@@ -14,7 +14,7 @@
     </el-header>
     <el-main>
 
-      <el-row justify="center" style="margin-top:30px;">
+      <el-row justify="center" style="margin-top:40px;">
         <el-select size="large" v-model="this.$store.state.accessServerID" placeholder="Select Access Server">
           <el-option style="padding-right: 20px;" v-for="item in this.$store.state.options" :key="item.value" :label="item.label" :value="item.value">
             <span style="float: left">{{ item.label }}</span>
@@ -25,10 +25,8 @@
         </el-select>
       </el-row>
 
-      <el-row justify="center" style="margin-top:80px;">
-        <el-tooltip class="item" effect="light" :content="this.$store.state.connectTips" :hide-after="100" placement="top">
-          <el-button class="el-button-connect" :icon="this.$store.state.connectIcon" @click="onConnectClick" :disabled="this.$store.state.connectDisable" circle></el-button>
-        </el-tooltip>
+      <el-row justify="center" :style="this.$store.state.buttonRowStyle">
+          <el-button id="connect" class="el-button-connect" :style="this.$store.state.buttonStyle" :icon="this.$store.state.connectIcon" @click="onConnectClick" :disabled="this.$store.state.connectDisable" circle></el-button>
       </el-row>
 
       <el-row justify="center" style="margin-top: 40px;">
@@ -68,7 +66,7 @@
         <div style="text-align: center;line-height: 60px;font-size: 14px;">Version: {{this.$store.state.version}}</div>
       </el-footer>
     </el-container>
-    
+
     <el-drawer title="Logs" size="100%" :append-to-body="true"  v-model="this.$store.state.showLogDrawer">
       <textarea style="height: 99.3%;width: 100%;border-width: 0;background-color: #eee;">{{this.$store.state.log}}</textarea>
     </el-drawer>
@@ -146,9 +144,9 @@
           <el-input v-model="this.$store.state.form.ProxyDomains" rows="6" wrap="off" type="textarea" placeholder="www.google.com(one item per line)"></el-input>
         </el-form-item>
         <el-form-item>
-          <el-button type="primary" plain @click="onSubmit">Save</el-button>
-          <el-button type="primary" plain @click="onDeleteClick" v-show="this.$store.state.showDelete" >Delete</el-button>
-          <el-button @click="onReset">Reset</el-button>
+          <el-button size="large" type="primary" plain @click="onSubmit">Save</el-button>
+          <el-button size="large" type="primary" plain @click="onDeleteClick" v-show="this.$store.state.showDelete" >Delete</el-button>
+          <el-button size="large" @click="onReset">Reset</el-button>
 
         </el-form-item>
       </el-form>
@@ -169,7 +167,8 @@
     const { createStore } = Vuex
     const { useStore } = Vuex
     const { ref } = Vue
-    const { ElMessage } = ElementPlus;
+    const { ElMessage } = ElementPlus
+    const { ElMessageBox } = ElementPlus
 
     //data for form
     var formData = {
@@ -203,10 +202,27 @@
       ]
     }
 
+    var buttonRowStyleData = {
+        marginTop:'80px'
+    }
+
+    var buttonStyleData = {
+      height: '120px',
+      width: '120px',
+      fontSize: '40px',
+      border: '4px',
+      color: 'blueviolet',
+      boxShadow:'0px 0px 10px #666'
+    }
+
+
     //state store for app
    const store = createStore({
     state(){
       return {
+        appType:'desktop', // desktop,android,ios
+        buttonStyle:buttonStyleData,
+        buttonRowStyle:buttonRowStyleData,
         log:'',
         version:'1.0.0',
         upBytes:' 0KB',
@@ -214,7 +230,6 @@
         options:[],
         accessServerID: '',
         connectIcon:'Promotion',
-        connectTips:'Connect To Access Server',
         showLeftDrawer: false,
         showRightDrawer: false,
         showLogDrawer:false,
@@ -235,6 +250,24 @@
       }
     }
     })
+
+    //patch for mobile api
+    if(store.state.appType == 'android') {
+
+      var funcs = ['GetVersion','GetAllLogs','GetAllAccessServer'
+      ,'GetUpDownBytes','ConnectAccessServer','StopAccessServer'
+      ,'AddAccessServer','UpdateAccessServer','DeleteAccessServer']
+
+      for(const index in funcs) {
+        window[funcs[index]] = function(req){
+          var promise = new Promise(function (resolve, reject) {
+            var resp = ext[funcs[index]](JSON.stringify(req))
+            resolve(JSON.parse(resp))
+          })
+          return promise
+        }
+      }
+    }
 
     //composition api for app
     const App = {
@@ -266,19 +299,28 @@
         onMounted(() => {
           console.log("onMounted")
 
+          if(store.state.appType != 'desktop'){
+            store.state.buttonRowStyle.marginTop = '120px'
+            store.state.buttonStyle.width = '160px'
+            store.state.buttonStyle.height = '160px'
+          }
+
           document.getElementById("app").style.display = 'block'
           
           window.GetVersion({}).then(function(resp){
             store.state.version = resp.Version
           })
+          
           loadAllServers(function(){
             if(store.state.accessServerID == '' && store.state.servers.length > 0){
-             store.state.accessServerID = store.state.servers[0].ID            }
+             store.state.accessServerID = store.state.servers[0].ID            
+            }
           })
 
          setInterval(function(){
             window.GetUpDownBytes({}).then(function(resp){})
           },5000)
+          
         })
 
         //-------------------onShowLogs----------------------
@@ -287,7 +329,7 @@
           store.state.showLogDrawer=true
         }
         //-------------------onConnectClick----------------------
-        function onConnectClick(){
+        function onConnectClick(evt){
 
           store.state.connectDisable = true
 
@@ -363,17 +405,28 @@
         }
         //-------------------onDeleteClick----------------------
         function onDeleteClick(){
-          window.DeleteAccessServer({ID:store.state.form.ID}).then(function(resp){
-            console.log(resp)
-            if(resp.Code!=0){
-              ElMessage({message: "delete fail,"+resp.Msg,type: 'warning',customClass:'alert'});
-            }
-            loadAllServers()
-          })
-          if(store.state.accessServerID == store.state.form.ID){
-            store.state.accessServerID = ''
+
+          ElMessageBox.confirm(
+          'Delete this Access Server?',
+          'Warning',
+          {
+            confirmButtonText: 'OK',
+            cancelButtonText: 'Cancel',
+            type: 'warning',
           }
-          rdrawer.value.handleClose()
+          ).then(() => {
+            window.DeleteAccessServer({ID:store.state.form.ID}).then(function(resp){
+              if(resp.Code!=0){
+                ElMessage({message: "delete fail,"+resp.Msg,type: 'warning',customClass:'alert'});
+              }
+              loadAllServers()
+            })
+            if(store.state.accessServerID == store.state.form.ID){
+              store.state.accessServerID = ''
+            }
+            rdrawer.value.handleClose()
+
+          })
         }
         //-------------------onSubmit----------------------
         function onSubmit(){
@@ -432,7 +485,6 @@
       }
     }
 
-
     //app entry
     const app = createApp(App)
     app.use(store)
@@ -445,6 +497,7 @@
 
     app.mount('#app')
 
+
     //callback for golang
     window.onCallback = function(msg){
       if(msg.event == 'started'){
@@ -452,7 +505,6 @@
         store.state.connectIcon = 'SuccessFilled'
         store.state.connectDisable = false
         store.state.connectStatus = 'Allocating IP Address...'
-        store.state.connectTips = 'Disconnect From Access Server'
 
       }else if(msg.event == 'stoped'){
         ElMessage({message: "Access server disconnected",type: 'success',customClass:'alert'});
@@ -461,7 +513,13 @@
         store.state.connectIcon = 'Promotion'
         store.state.connectDisable = false
         store.state.connectStatus = 'Disconnected'
-        store.state.connectTips = 'Connect To Access Server'
+
+      }else if(msg.event == 'refresh'){
+        store.state.connectIcon = 'SuccessFilled'
+        store.state.connectDisable = false
+        store.state.connectStatus = ''
+        store.state.localIp = 'LocalIP: ' +msg.data.ip
+        store.state.remoteIp = 'RemoteIP: ' +msg.data.remoteIp
 
       }else if(msg.event == "allocated"){
 
@@ -511,14 +569,6 @@
     .alert {
     min-width: 90%;
     }
-    .el-button-connect {
-    height: 120px;
-    width: 120px;
-    font-size: 40px;
-    border: 4px;
-    color: blueviolet;
-    box-shadow:0px 0px 10px #666;
-    }
 
     .el-header, .el-footer {
     text-align: center;
@@ -548,7 +598,9 @@
     padding: 0px 0px 0px 0px;
     }
 
-
+    .el-button-connect:focus, .el-button-connect:hover {
+    background-color: #fff;
+    }
     .el-drawer-right {
     padding: 10px;
     }
