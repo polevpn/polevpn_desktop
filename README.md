@@ -1,6 +1,6 @@
 # PoleVPN Desktop 
 
-[download polevpn_desktop]https://www.polevpn.com/index.html#download)
+[download polevpn_desktop](https://www.polevpn.com/index.html#download)
 
 #### for windows users
 ```
@@ -38,6 +38,9 @@ save the configration
 then click the litte airplane
 ```
 -------------------------------------------------------------------------------------------
+
+[点这里下载](https://www.polevpn.com/index-zh.html#download)
+
 
 #### windows 用户
 ```
