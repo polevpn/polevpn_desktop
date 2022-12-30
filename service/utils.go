@@ -1,7 +1,10 @@
 package main
 
 import (
+	"crypto/md5"
 	_ "embed"
+	"encoding/hex"
+	"github.com/denisbrodbeck/machineid"
 	"net"
 	"os"
 	"strings"
@@ -40,4 +43,17 @@ func GetRouteIpsFromDomain(domains []string) []string {
 		}
 	}
 	return ips
+}
+
+func GetDeviceId() string {
+	id, err := machineid.ID()
+	if err != nil {
+		return "11111111111111111111111111111111"
+	}
+
+	h := md5.New()
+	h.Write([]byte(id))
+	result := hex.EncodeToString(h.Sum(nil))
+
+	return result
 }

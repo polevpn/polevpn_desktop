@@ -205,19 +205,26 @@ func (rh *RequestHandler) start(server *anyvalue.AnyValue) error {
 		return err
 	}
 
+	deviceType := "Unknown"
+
 	if runtime.GOOS == "darwin" {
 		rh.networkmgr = core.NewDarwinNetworkManager()
+		deviceType = "Macos"
 	} else if runtime.GOOS == "linux" {
 		rh.networkmgr = core.NewLinuxNetworkManager()
+		deviceType = "Linux"
 	} else if runtime.GOOS == "windows" {
 		rh.networkmgr = core.NewWindowsNetworkManager()
+		deviceType = "Windows"
 	} else {
 		return errors.New("os platform not support")
 	}
 
 	rh.client.SetEventHandler(rh.OnClientEvent)
 
-	go rh.client.Start(server.Get("Endpoint").AsStr(), server.Get("User").AsStr(), server.Get("Password").AsStr(), server.Get("Sni").AsStr(), server.Get("SkipVerifySSL").AsBool())
+	deviceId := GetDeviceId()
+
+	go rh.client.Start(server.Get("Endpoint").AsStr(), server.Get("User").AsStr(), server.Get("Password").AsStr(), server.Get("Sni").AsStr(), server.Get("SkipVerifySSL").AsBool(), deviceType, deviceId)
 
 	return nil
 }
