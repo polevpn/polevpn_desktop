@@ -1,5 +1,5 @@
 go mod tidy
-go build  -ldflags="-s -w"
+go build  -ldflags="-s -w" 
 mkdir -p build/macos
 cp -r resource/PoleVPN.app build/macos/ 
 mkdir -p build/macos/PoleVPN.app/Contents/MacOS/service
