@@ -118,13 +118,13 @@
     <div class="el-drawer-right">
       <el-form ref="form" size="small" :model="this.$store.state.form" :rules="this.$store.state.rules" label-width="80px" label-position="top">
         <el-form-item label="Name" prop="Name">
-          <el-input v-model="this.$store.state.form.Name" placeholder="server name"></el-input>
+          <el-input v-model="this.$store.state.form.Name" spellcheck="false" placeholder="server name"></el-input>
         </el-form-item>
         <el-form-item label="Endpoint" prop="Endpoint">
-          <el-input v-model="this.$store.state.form.Endpoint" placeholder="start with wss:// or h3s://"></el-input>
+          <el-input v-model="this.$store.state.form.Endpoint" spellcheck="false" placeholder="start with wss:// or h3s://"></el-input>
         </el-form-item>
         <el-form-item label="User" prop="User">
-          <el-input v-model="this.$store.state.form.User"></el-input>
+          <el-input v-model="this.$store.state.form.User" spellcheck="false" ></el-input> 
         </el-form-item>
         <el-form-item label="Password" prop="Password">
           <el-input v-model="this.$store.state.form.Password" minlength="6" maxlength="16" show-password></el-input>
@@ -136,7 +136,7 @@
           <el-switch v-model="this.$store.state.form.UseRemoteRouteRules"></el-switch>
         </el-form-item>
         <el-form-item label="Sni (option)" prop="Sni">
-          <el-input v-model="this.$store.state.form.Sni"></el-input>
+          <el-input v-model="this.$store.state.form.Sni" spellcheck="false"></el-input>
         </el-form-item>
         <el-form-item label="Local Route Rules (option)" prop="LocalRouteRules">
           <el-input v-model="this.$store.state.form.LocalRouteRules" rows="6" wrap="off" type="textarea" placeholder="10.8.0.0/8(one item per line)"></el-input>
