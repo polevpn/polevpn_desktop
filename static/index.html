@@ -139,10 +139,10 @@
           <el-input v-model="this.$store.state.form.Sni" spellcheck="false"></el-input>
         </el-form-item>
         <el-form-item label="Local Route Rules (option)" prop="LocalRouteRules">
-          <el-input v-model="this.$store.state.form.LocalRouteRules" rows="6" wrap="off" type="textarea" placeholder="10.8.0.0/8(one item per line)"></el-input>
+          <el-input v-model="this.$store.state.form.LocalRouteRules" spellcheck="false" rows="6" wrap="off" type="textarea" placeholder="10.8.0.0/8(one item per line)"></el-input>
         </el-form-item>
         <el-form-item label="ProxyDomains (option)" prop="ProxyDomains">
-          <el-input v-model="this.$store.state.form.ProxyDomains" rows="6" wrap="off" type="textarea" placeholder="www.google.com(one item per line)"></el-input>
+          <el-input v-model="this.$store.state.form.ProxyDomains" spellcheck="false" rows="6" wrap="off" type="textarea" placeholder="www.google.com(one item per line)"></el-input>
         </el-form-item>
         <el-form-item>
           <el-button size="large" type="primary" plain @click="onSubmit">Save</el-button>
