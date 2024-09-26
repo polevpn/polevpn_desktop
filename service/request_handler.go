@@ -23,7 +23,7 @@ type RequestHandler struct {
 	mutex      *sync.Mutex
 	status     int
 	server     *anyvalue.AnyValue
-	client     *core.PoleVpnClient
+	client     core.PoleVpnClient
 	networkmgr core.NetworkManager
 	device     *core.TunDevice
 }
@@ -33,7 +33,7 @@ func NewRequestHandler() *RequestHandler {
 	return &RequestHandler{mutex: &sync.Mutex{}, status: CLIENT_STOPPED}
 }
 
-func (rh *RequestHandler) OnClientEvent(event int, client *core.PoleVpnClient, av *anyvalue.AnyValue) {
+func (rh *RequestHandler) OnClientEvent(event int, client core.PoleVpnClient, av *anyvalue.AnyValue) {
 
 	defer core.PanicHandler()
 
@@ -199,10 +199,17 @@ func (rh *RequestHandler) start(server *anyvalue.AnyValue) error {
 	rh.server = server
 
 	var err error
-	rh.client, err = core.NewPoleVpnClient()
 
-	if err != nil {
-		return err
+	if strings.HasPrefix(server.Get("Endpoint").AsStr(), "proxy://") {
+		rh.client, err = core.NewPoleVpnClientProxy()
+		if err != nil {
+			return err
+		}
+	} else {
+		rh.client, err = core.NewPoleVpnClientVLAN()
+		if err != nil {
+			return err
+		}
 	}
 
 	deviceType := "Unknown"
