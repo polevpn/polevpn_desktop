@@ -1,5 +1,6 @@
 echo "install tuntap driver"
 
+deps\drivers\devcon.exe remove tap0901
 deps\drivers\devcon.exe install deps\drivers\OemVista.inf tap0901
 
 reg query  "HKLM\SOFTWARE\WOW6432Node\Microsoft\EdgeUpdate\Clients\{F3017226-FE2A-4295-8BDF-00C3A9A7E4C5}"
