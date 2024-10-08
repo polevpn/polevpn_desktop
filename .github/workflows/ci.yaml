@@ -15,7 +15,7 @@ jobs:
       - name: Build Linux
         run: ./build_linux.sh
       - name: Upload Zip
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: PoleVPN-linux
           path: build/linux/PoleVPN.zip
@@ -32,7 +32,7 @@ jobs:
       - name: Build Macos
         run: ./build_macos.sh
       - name: Upload Zip
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: PoleVPN-macos
           path: build/macos/PoleVPN.zip
@@ -47,7 +47,7 @@ jobs:
       - name: Build Windows
         run: bash ./build_win.sh
       - name: Upload Zip
-        uses: actions/upload-artifact@v1
+        uses: actions/upload-artifact@v4
         with:
           name: PoleVPN-win
           path: build/win/PoleVPN.tgz
