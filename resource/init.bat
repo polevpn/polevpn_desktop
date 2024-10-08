@@ -1,4 +1,5 @@
-echo "install tuntap driver"
+@echo off
+echo install tuntap driver
 
 deps\drivers\devcon.exe remove tap0901
 deps\drivers\devcon.exe install deps\drivers\OemVista.inf tap0901
@@ -16,7 +17,7 @@ if %errorlevel% neq 0 goto INSTALL
 if %errorlevel% equ 0 goto YES
 
 :YES
-echo Webview2Runtime installed
+echo Webview2Runtime has been installed
 goto END
 
 :INSTALL
