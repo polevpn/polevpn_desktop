@@ -11,7 +11,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16.x
+          go-version: 1.23.x
       - name: Build Linux
         run: ./build_linux.sh
       - name: Upload Zip
@@ -28,7 +28,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16.x
+          go-version: 1.23.x
       - name: Build Macos
         run: ./build_macos.sh
       - name: Upload Zip
@@ -43,7 +43,7 @@ jobs:
       - name: Install Go
         uses: actions/setup-go@v2
         with:
-          go-version: 1.16.x
+          go-version: 1.23.x
       - name: Build Windows
         run: bash ./build_win.sh
       - name: Upload Zip
