@@ -7,6 +7,9 @@ mkdir -p build/win/PoleVPN
 mkdir -p build/win/PoleVPN/service
 mkdir -p build/win/PoleVPN/deps
 cp polevpn_desktop.exe build/win/PoleVPN/PoleVPN.exe
+cp resource/polevpn.ico build/win/PoleVPN/polevpn.ico
+cp resource/polevpn.nsi build/win/PoleVPN/polevpn.nsi
+cp resource/license.txt build/win/PoleVPN/license.txt
 cp lib/Webview2Loader.dll build/win/PoleVPN
 cp -r resource/drivers build/win/PoleVPN/deps
 cp -r resource/MicrosoftEdgeWebview2Setup.exe build/win/PoleVPN/deps
