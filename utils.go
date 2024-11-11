@@ -3,10 +3,12 @@ package main
 import (
 	_ "embed"
 	"errors"
+	"net"
 	"net/http"
 	"os"
 	"path/filepath"
 	"runtime"
+	"strings"
 	"time"
 
 	core "github.com/polevpn/polevpn_core"
@@ -78,6 +80,78 @@ func StartService(logPath string) error {
 	}
 	if !exist {
 		return errors.New("start service fail")
+	}
+	return nil
+}
+
+func GetInterfaceList() ([]string, error) {
+
+	interfaces, err := net.Interfaces()
+	if err != nil {
+		return nil, err
+	}
+
+	outStr := make([]string, 0)
+
+	for _, i := range interfaces {
+		byName, err := net.InterfaceByName(i.Name)
+		if err != nil {
+			return nil, err
+		}
+		addresses, err := byName.Addrs()
+		if err != nil {
+			return nil, err
+		}
+		for _, v := range addresses {
+			if strings.Contains(v.String(), ":") {
+				continue
+			}
+
+			if strings.Contains(v.String(), "169.") || strings.Contains(v.String(), "127.") {
+				continue
+			}
+
+			_, _, err := net.ParseCIDR(v.String())
+			if err != nil {
+				continue
+			}
+			outStr = append(outStr, i.Name)
+		}
+	}
+
+	if len(outStr) == 0 {
+		return nil, errors.New("can not find any interface")
+	}
+
+	return outStr, nil
+}
+
+func ClearDns(device string) error {
+
+	cmd := "netsh interface ip set dns \"" + device + "\" dhcp"
+	args := strings.Split(cmd, " ")
+
+	out, err := core.ExecuteCommand(args[0], args[1:]...)
+
+	if err != nil {
+		return errors.New(err.Error() + "," + string(out))
+	}
+	return nil
+}
+
+func RestoreDnsServer() error {
+
+	devices, err := GetInterfaceList()
+
+	if err != nil {
+		return errors.New("set dns fail," + err.Error())
+	}
+
+	for _, deviceName := range devices {
+		err = ClearDns(deviceName)
+		if err != nil {
+			return errors.New("set dns fail," + err.Error())
+		}
 	}
 	return nil
 }

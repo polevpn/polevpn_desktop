@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 	"os/signal"
+	"runtime"
 	"syscall"
 
 	"github.com/polevpn/elog"
@@ -35,6 +36,10 @@ func main() {
 	}
 
 	glog.SetLogPath(homeDir + string(os.PathSeparator) + ".polevpn")
+
+	if runtime.GOOS == "windows" {
+		RestoreDnsServer()
+	}
 
 	glog.Info("check service")
 	exist := CheckServiceExist()
@@ -94,6 +99,9 @@ func main() {
 		controller.StopAccessServer(ReqStopAccessServer{})
 		glog.Info("exit")
 		glog.Flush()
+		if runtime.GOOS == "windows" {
+			RestoreDnsServer()
+		}
 	})
 
 	glog.Info("app running")
