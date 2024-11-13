@@ -13,7 +13,7 @@ var glog *elog.EasyLogger
 var handler *RequestHandler
 
 func signalHandler() {
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 10)
 	signal.Notify(c, syscall.SIGINT, syscall.SIGHUP, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		for s := range c {

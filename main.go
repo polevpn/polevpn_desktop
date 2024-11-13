@@ -109,7 +109,7 @@ func main() {
 }
 
 func signalHandler() {
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 10)
 	signal.Notify(c, syscall.SIGHUP, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
 	go func() {
 		for s := range c {
