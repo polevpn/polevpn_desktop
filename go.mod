@@ -8,7 +8,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/polevpn/anyvalue v1.0.6
 	github.com/polevpn/elog v1.1.1
-	github.com/polevpn/polevpn_core v1.2.30
+	github.com/polevpn/polevpn_core v1.2.32
 	github.com/polevpn/systray v1.1.2
 	github.com/polevpn/webview v1.0.8
 	gorm.io/driver/sqlite v1.4.3
@@ -24,7 +24,7 @@ require (
 	github.com/mattn/go-sqlite3 v1.14.15 // indirect
 	github.com/onsi/ginkgo/v2 v2.9.5 // indirect
 	github.com/polevpn/h3conn v1.0.20 // indirect
-	github.com/polevpn/netstack v1.10.12 // indirect
+	github.com/polevpn/netstack v1.10.14 // indirect
 	github.com/polevpn/water v1.0.4 // indirect
 	github.com/quic-go/qpack v0.5.1 // indirect
 	github.com/quic-go/quic-go v0.47.0 // indirect
