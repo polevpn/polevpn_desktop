@@ -8,7 +8,7 @@ require (
 	github.com/gorilla/websocket v1.5.0
 	github.com/polevpn/anyvalue v1.0.6
 	github.com/polevpn/elog v1.1.3
-	github.com/polevpn/polevpn_core v1.2.43
+	github.com/polevpn/polevpn_core v1.2.44
 	github.com/polevpn/systray v1.1.2
 	github.com/polevpn/webview v1.0.12
 	gorm.io/driver/sqlite v1.4.3
