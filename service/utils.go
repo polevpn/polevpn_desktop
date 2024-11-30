@@ -4,11 +4,13 @@ import (
 	"crypto/md5"
 	_ "embed"
 	"encoding/hex"
-	"github.com/denisbrodbeck/machineid"
 	"net"
 	"os"
 	"strings"
+	"sync"
 	"time"
+
+	"github.com/denisbrodbeck/machineid"
 )
 
 //go:embed version
@@ -30,18 +32,29 @@ func GetTimeNowDate() string {
 func GetRouteIpsFromDomain(domains []string) []string {
 
 	ips := make([]string, 0)
-	for _, domain := range domains {
 
-		netips, err := net.LookupIP(domain)
-		if err != nil {
-			continue
-		}
-		for _, netip := range netips {
-			if !strings.Contains(netip.String(), ":") {
-				ips = append(ips, netip.String()+"/32")
+	mutex := sync.Mutex{}
+	wg := sync.WaitGroup{}
+
+	for _, domain := range domains {
+		wg.Add(1)
+		go func() {
+			defer wg.Done()
+			netips, err := net.LookupIP(domain)
+			if err != nil {
+				return
 			}
-		}
+			for _, netip := range netips {
+				if !strings.Contains(netip.String(), ":") {
+					mutex.Lock()
+					ips = append(ips, netip.String()+"/32")
+					mutex.Unlock()
+				}
+			}
+		}()
+
 	}
+	wg.Wait()
 	return ips
 }
 
