@@ -10,7 +10,7 @@ require (
 	github.com/polevpn/elog v1.1.5
 	github.com/polevpn/polevpn_core v1.3.2
 	github.com/polevpn/systray v1.1.2
-	github.com/polevpn/webview v1.0.12
+	github.com/polevpn/webview v1.0.13
 	gorm.io/driver/sqlite v1.4.3
 	gorm.io/gorm v1.24.2
 )
