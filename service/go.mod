@@ -9,7 +9,7 @@ require (
 	github.com/gorilla/websocket v1.4.2
 	github.com/polevpn/anyvalue v1.0.6
 	github.com/polevpn/elog v1.1.5
-	github.com/polevpn/polevpn_core v1.3.3
+	github.com/polevpn/polevpn_core v1.3.4
 )
 
 require (

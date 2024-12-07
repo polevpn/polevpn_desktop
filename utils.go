@@ -139,7 +139,7 @@ func ClearDns(device string) error {
 	return nil
 }
 
-func RestoreDnsServer() error {
+func RestoreDnsServerWin() error {
 
 	devices, err := GetInterfaceList()
 
@@ -154,4 +154,22 @@ func RestoreDnsServer() error {
 		}
 	}
 	return nil
+}
+
+func RestoreDnsServerDarwin() error {
+
+	out, err := core.ExecuteCommand("bash", "-c", "networksetup -setdnsservers Wi-Fi empty")
+
+	if err != nil {
+		return errors.New("restore dns fail," + err.Error() + "," + string(out))
+	}
+
+	out, err = core.ExecuteCommand("bash", "-c", "networksetup -setdnsservers Ethernet empty")
+
+	if err != nil {
+		return errors.New("restore dns fail," + err.Error() + "," + string(out))
+	}
+
+	return nil
+
 }

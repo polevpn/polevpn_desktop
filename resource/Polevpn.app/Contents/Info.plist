@@ -5,7 +5,7 @@
     <key>CFBundlePackageType</key>
     <string>APPL</string>
     <key>NSHumanReadableCopyright</key>
-    <string>1.0.4, Copyright © 2021 The PoleVPN</string>
+    <string>Copyright © 2021 The PoleVPN</string>
     <key>CFBundleShortVersionString</key>
     <string>1.0.4</string>
     <key>CFBundleVersion</key>
@@ -24,5 +24,7 @@
     <string>NSApplication</string>
     <key>CFBundleIconFile</key>
     <string>polevpn.icns</string>
+    <key>LSMinimumSystemVersion</key>
+    <string>11.0</string>
 </dict>
 </plist>

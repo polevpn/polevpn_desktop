@@ -38,7 +38,9 @@ func main() {
 	glog.SetLogPath(homeDir + string(os.PathSeparator) + ".polevpn")
 
 	if runtime.GOOS == "windows" {
-		RestoreDnsServer()
+		RestoreDnsServerWin()
+	} else if runtime.GOOS == "darwin" {
+		RestoreDnsServerDarwin()
 	}
 
 	glog.Info("check service")
@@ -100,7 +102,9 @@ func main() {
 		glog.Info("exit")
 		glog.Flush()
 		if runtime.GOOS == "windows" {
-			RestoreDnsServer()
+			RestoreDnsServerWin()
+		} else if runtime.GOOS == "darwin" {
+			RestoreDnsServerDarwin()
 		}
 	})
 
